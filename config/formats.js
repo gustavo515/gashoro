@@ -605,6 +605,13 @@ exports.Formats = [
 		ruleset: ['OU']
 	},
 	{
+		name: "Drastic Tier Shift",
+		section: "Ultimate",
+
+		mod: 'drasticshift',
+		ruleset: ['OU']
+	},
+	{
 		name: "PU",
 		section: "Other Metagames",
 
