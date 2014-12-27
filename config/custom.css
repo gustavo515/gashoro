@@ -1,73 +1,95 @@
 body {
-    background-image:url("http://fc05.deviantart.net/fs70/f/2009/346/e/b/Suicune_Wallpaper_by_Super_Bastard.jpg");
-    background-repeat:no-repeat;
-    background-position:center
+background-image:url("http://fc05.deviantart.net/fs70/f/2009/346/e/b/Suicune_Wallpaper_by_Super_Bastard.jpg");
+background-repeat:no-repeat;
+background-position:center
 }
-
 .menugroup .button {
-    background:url(235, 35, 242, .8);
-    color:#FFFFFF;
+background:url(235, 35, 242, .8);
+color:#FFFFFF;
 }
-
 .menugroup .button:hover {
-    background:#EB23F2;
-    color:#FFFFFF;
+background:#EB23F2;
+color:#FFFFFF;
 }
-
 .menugroup {
-    background:rgba(62, 214, 238, .34);
+background:rgba(62, 214, 238, .34);
 }
-
 .header {
-    background:#3ED6EE;
+background:#3ED6EE;
 }
-
 .userlist {
-    background:rgba(62, 214, 238, .7);
+background:rgba(62, 214, 238, .7);
 }
-
 .userlist li {
-    border-bottom: 1px solid #000;
+border-bottom: 1px solid #000;
 }
-
 .userlist li em.group {
-    color: #000;
+color: #000;
 }
-
 .userlist li button:hover {
-    background:#1DA7BC;
+background:#1DA7BC;
 }
-
-.teambuilder-results { 
-    color:#FFF812;
+.teambuilder-results {
+color:#FFF812;
 }
-
-.ps-room.ps-room-light.scrollable {
-    background:url(235, 35, 242, .44);
-        color:#FFFFFF;
+.ps-room.ps-room-light {
+background:rgba(242, 247, 250, 0.5);
 }
-
 .pm-window {
-    background: rgba(34, 34, 34, 0.8);
+background: rgba(34, 34, 34, 0.8);
 }
-
 .pm-log {
-    background:url("http://i.imgur.com/Q8vHT0Y.png");
-    color:#333333;
-    font-style:italic;
+background:url("http://i.imgur.com/Q8vHT0Y.png");
+color:#333333;
+font-style:italic;
 }
-
 .pm-log:hover {
-    color:#000000;
+color:#000000;
 }
-
 .pm-log-add {
-    background: rgba(34, 34, 34, 0.8);
-    border-radius: 0px;
+background: rgba(34, 34, 34, 0.8);
+border-radius: 0px;
 }
-
 .pm-log-add:hover {
-    background:#222;
+background:#222;
+}
+.chat-log-add {background:rgba(62, 214, 238, 0.7);}
+  
+  .statform .col div label, .statform .col div em, .statform .col div b {
+    display: block;
+    padding: 5px 0px 0px;
+    color:#000;
+}
+  
+  .statform .evcol, .statform .ivcol {
+    text-align: center;
+    color:#000;
+}
+  
+  .jslider .jslider-value {
+    font-size: 9px;
+    white-space: nowrap;
+    line-height: 12px;
+    color:#000;
+}
+  
+  .teambuilder-results h3, .teambuilder-results .utilichart h3 {
+    color:#000;
+  }
+  
+  .statform {
+    color:#000;
+  }
+  .roomlist {
+    text-align: left;
+    color:#000;
 }
 
-.chat-log-add {background:rgba(62, 214, 238, 0.7);}
+.roomlist a.ilink {
+    color: #3ED6EE;
+    text-shadow: 0px -1px 0px #FFF;
+    cursor: pointer;
+    font-size: 10pt;
+    white-space: nowrap;
+background:#2b2b2b;
+}
