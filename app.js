@@ -408,5 +408,6 @@ fs.readFile('./config/ipbans.txt', function (err, data) {
 	Users.checkRangeBanned = Cidr.checker(rangebans);
 });
 
+global.Shop = require('./shop.js');
 global.Clans = require('./clans.js');
 global.War = require('./war.js');

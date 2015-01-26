@@ -2259,6 +2259,92 @@ var commands = exports.commands = {
 	},
 	
 	/*********************************************************
+	 * Shop commands
+	 *********************************************************/
+
+	moneyhelp: 'pdhelp',
+	pdhelp: function () {
+		if (!this.canBroadcast()) return false;
+		this.sendReplyBox(
+			"<b><u>Comandos referentes a los PDs</u></b><br /><br />" +
+			"/pd (user) - muestra los ahorros de un usuario.<br />" +
+			"/donate (user), (money) - Dona una cantidad determinada a otro usuario.<br />" +
+			"/givemoney (user), (pds) - Da una cantidad de Pds a un usuario.<br />" +
+			"/removemoney (user), (pds) - Quita una cantidad de Pds a un usuario.<br />"
+		);
+	},
+
+	money: 'pd',
+	pd: function (target, room, user) {
+		var autoData = false;
+		if (!target) autoData = true;
+		if (!this.canBroadcast()) return false;
+
+		var pds = 0;
+		var userName = user.name;
+		if (autoData) {
+			pds = Shop.getUserMoney(user.name);
+		} else {
+			pds = Shop.getUserMoney(target);
+			userName = toId(target);
+			var userh = Users.getExact(target);
+			if (userh) userName = userh.name;
+		}
+		this.sendReplyBox('Ahorros de <b>' + userName + '</b>: ' + pds + ' pd');
+	},
+
+	givemoney: function (target, room, user) {
+		var params = target.split(',');
+		if (!params || params.length !== 2) return this.sendReply("Usage: /givemoney usuario, pds");
+		if (!this.can('givemoney')) return false;
+
+		var pds = parseInt(params[1]);
+		if (pds <= 0) return this.sendReply("La cantidad no es valida.");
+		var userh = Users.getExact(params[0]);
+		if (!userh || !userh.connected) return this.sendReply("El usuario no existe o no está disponible");
+		var userName = userh.name;
+		if (!Shop.giveMoney(params[0], pds)) {
+			this.sendReply("Error desconocido.");
+		} else {
+			this.sendReply(userName + ' ha recibido ' + pds + ' pd');
+		}
+	},
+
+	removemoney: function (target, room, user) {
+		var params = target.split(',');
+		if (!params || params.length !== 2) return this.sendReply("Usage: /removemoney usuario, pds");
+		if (!this.can('givemoney')) return false;
+
+		var pds = parseInt(params[1]);
+		if (pds <= 0) return this.sendReply("La cantidad no es valida.");
+		var userh = Users.getExact(params[0]);
+		var userName = toId(params[0]);
+		if (userh) userName = userh.name;
+		if (!Shop.removeMoney(params[0], pds)) {
+			this.sendReply("El usuario no tenía suficientes Pds.");
+		} else {
+			this.sendReply(userName + ' ha perdido ' + pds + ' pd');
+		}
+	},
+
+	donar: 'donate',
+	donate: function (target, room, user) {
+		var params = target.split(',');
+		if (!params || params.length !== 2) return this.sendReply("Usage: /donate usuario, pds");
+
+		var pds = parseInt(params[1]);
+		if (!pds || pds <= 0) return this.sendReply("La cantidad no es valida.");
+		var userh = Users.getExact(params[0]);
+		if (!userh || !userh.connected) return this.sendReply("El usuario no existe o no está disponible");
+		var userName = userh.name;
+		if (!Shop.transferMoney(user.name, params[0], pds)) {
+			this.sendReply("No tienes suficientes pds.");
+		} else {
+			this.sendReply('Has donado ' + pds + ' pd al usuario ' + userName + '.');
+		}
+	},
+	
+	/*********************************************************
 	 * Help commands
 	 *********************************************************/
 
