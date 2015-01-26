@@ -2,7 +2,7 @@ const clanDataFile = './config/clans.json';
 const warLogDataFile = './config/warlog.json';
 
 var fs = require('fs');
-var elo = require('elo-rank')();
+var elo = require('./elo.js')();
 
 if (!fs.existsSync(clanDataFile))
 	fs.writeFileSync(clanDataFile, '{}');
