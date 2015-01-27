@@ -155,7 +155,7 @@ exports.joinTeamTour = function (room, user, team) {
 	var userId = toId(user);
 	if (!wars[roomId]) return 'No había ninguna guerra en esta sala.';
 	if (wars[roomId].tourRound !== 0) return 'La guerra ya ha empezado. No te puedes unir.';
-	if (wars[roomId].type === 'lineups') return 'Los equipos deben ser registrados por los capitanes de los clanes en esta guerra.';
+	if (wars[roomId].type === 'lineups') return 'Los equipos deben ser registrados por los capitanes de los gremios en esta guerra.';
 	if (!exports.joinable(room, user)) return 'Ya estabas inscrito en este torneo. Para jugar por otro equipo primero debes salir.';
 	var registeredA = Object.keys(wars[roomId].teamAMembers);
 	var registeredB = Object.keys(wars[roomId].teamBMembers);
@@ -239,7 +239,7 @@ exports.leaveTeamTour = function (room, user) {
 		}
 		return 'Has salido de la guerra.';
 	} else {
-		if (wars[roomId].type === 'lineups') return 'Los equipos deben ser registrados por los capitanes de los clanes en esta guerra.';
+		if (wars[roomId].type === 'lineups') return 'Los equipos deben ser registrados por los capitanes de los gremios en esta guerra.';
 		if (wars[roomId].teamAMembers[userId]) delete wars[roomId].teamAMembers[userId];
 		if (wars[roomId].teamBMembers[userId]) delete wars[roomId].teamBMembers[userId];
 	}
@@ -530,8 +530,8 @@ var cmds = {
 			case 'help':
 				if (!this.canBroadcast()) return false;
 				this.sendReplyBox(
-					'<font size = 2>Guerras entre clanes</font><br />' +
-					'Se trata de un sistema automatizado de guerras (enfrentamientos) entre 2 clanes dentro de un sistema de puntuación o ranking. Las wars solo pueden ser iniciadas en las salas destinadas a ello. Los Voiced pueden crearlas y terminarlas y el staff puede manejar el resto de comandos administrativos. Asi mismo, los oficiales y líderes de los clanes pueden descalificar y reemplazar a sus miembros.<br />' +
+					'<font size = 2>Guerras entre gremios</font><br />' +
+					'Se trata de un sistema automatizado de guerras (enfrentamientos) entre 2 gremios dentro de un sistema de puntuación o ranking. Las wars solo pueden ser iniciadas en las salas destinadas a ello. Los Voiced pueden crearlas y terminarlas y el staff puede manejar el resto de comandos administrativos. Asi mismo, los oficiales y líderes de los gremios pueden descalificar y reemplazar a sus miembros.<br />' +
 					'Los comandos están compactados en /war y son los siguientes:<br />' +
 					'<ul><li>/war new, [standard/total], [tier/multitier], [tamaño], [clanA], [clanB] - Crea una guerra.</li>' +
 					'<li>/war new, [lineups], [tier/multitier], [tamaño], [clanA], [clanB], [capitanA], [capitanB] - Crea una guerra con alinaciones fijas.</li>' +
@@ -543,7 +543,7 @@ var cmds = {
 					'<li>/war replace, [usuario1], [usuario2] - Comando para reemplazar.</li>' +
 					'<li>/war invalidate, [participante] - Comando para invalidar una batalla o un resultado.</li>' +
 					'<li>/war size, [Jugadores por team] - Cambia el tamaño de la guerra.</li>' +
-					'<li>/war auth, [Capitan1], [Capitan2] - Establece los capitanes de los clanes.</li>' +
+					'<li>/war auth, [Capitan1], [Capitan2] - Establece los capitanes de los gremios.</li>' +
 					'<li>/war reg, [P1], [P2]... - Comando para registrar alineaciones, solo usable por los capitanes.</li>' +
 					'<li>/war start - Inicia una guerra una vez registradas las alineaciones.</li>' +
 					'<li>/war search - Muestra las guerras en curso del servidor.</li>' +
@@ -560,19 +560,19 @@ var cmds = {
 				if (size < 3) return this.sendReply("Mínimo deben ser 3 jugadores por clan.");
 				var format = War.tourTiers[toId(params[2])];
 				if (!format) return this.sendReply("Formato no válido.");
-				if (!Clans.getProfile(params[4]) || !Clans.getProfile(params[5])) return this.sendReply("Alguno de los clanes no existía.");
-				if (War.findClan(params[4]) || War.findClan(params[5])) return this.sendReply("Alguno de los clanes ya estaba en guerra.");
+				if (!Clans.getProfile(params[4]) || !Clans.getProfile(params[5])) return this.sendReply("Alguno de los gremios no existía.");
+				if (War.findClan(params[4]) || War.findClan(params[5])) return this.sendReply("Alguno de los gremios ya estaba en guerra.");
 				params[4] = Clans.getClanName(params[4]);
 				params[5] = Clans.getClanName(params[5]);
 				switch (toId(params[1])) {
 					case 'standard':
 						War.newTeamTour(room.id, 'standard', format, size, Tools.escapeHTML(params[4]), Tools.escapeHTML(params[5]));
-						this.logModCommand(user.name + " ha iniciado una guerra standard entre los clanes " + toId(params[4]) + " y " + toId(params[5]) + " en formato " + format + ".");
+						this.logModCommand(user.name + " ha iniciado una guerra standard entre los gremios " + toId(params[4]) + " y " + toId(params[5]) + " en formato " + format + ".");
 						Rooms.rooms[room.id].addRaw('<hr /><h2><font color="green">' + user.name + ' ha iniciado una guerra standard en formato ' + format + ' entre ' + Tools.escapeHTML(params[4]) + " y " + Tools.escapeHTML(params[5]) +  '.</font></h2><b>Para unirse a la war: <button name="send" value="/war join">/war join</button></b><br /><b><font color="blueviolet">Jugadores por equipo:</font></b> ' + size + '<br /><font color="blue"><b>FORMATO:</b></font> ' + format + '<hr /><br /><font color="red"><b>Recuerda que debes mantener tu nombre durante toda la duración de la guerra.</b></font>');
 						break;
 					case 'total':
 						War.newTeamTour(room.id, 'total', format, size, Tools.escapeHTML(params[4]), Tools.escapeHTML(params[5]));
-						this.logModCommand(user.name + " ha iniciado una guerra total entre los clanes " + toId(params[4]) + " y " + toId(params[5]) + " en formato " + format + ".");
+						this.logModCommand(user.name + " ha iniciado una guerra total entre los gremios " + toId(params[4]) + " y " + toId(params[5]) + " en formato " + format + ".");
 						Rooms.rooms[room.id].addRaw('<hr /><h2><font color="green">' + user.name + ' ha iniciado una guerra total en formato ' + format + ' entre ' + Tools.escapeHTML(params[4]) + " y " + Tools.escapeHTML(params[5]) +  '.</font></h2><b>Para unirse a la war: <button name="send" value="/war join">/war join</button></b><br /><b><font color="blueviolet">Jugadores por equipo:</font></b> ' + size + '<br /><font color="blue"><b>FORMATO:</b></font> ' + format + '<hr /><br /><font color="red"><b>Recuerda que debes mantener tu nombre durante toda la duración de la guerra.</b></font>');
 						break;
 					case 'lineups':
@@ -587,7 +587,7 @@ var cmds = {
 						targetClan = Clans.findClanFromMember(userCapB.name);
 						if (toId(targetClan) !== toId(params[5])) return this.sendReply("El usuario " + Tools.escapeHTML(params[7]) + " no pertenece al clan del que se le asigna capitan.");
 						War.newTeamTour(room.id, 'lineups', format, size, Tools.escapeHTML(params[4]), Tools.escapeHTML(params[5]), userCapA.name, userCapB.name);
-						this.logModCommand(user.name + " ha iniciado una guerra con alineaciones entre los clanes " + toId(params[4]) + " y " + toId(params[5]) + " en formato " + format + ".");
+						this.logModCommand(user.name + " ha iniciado una guerra con alineaciones entre los gremios " + toId(params[4]) + " y " + toId(params[5]) + " en formato " + format + ".");
 						Rooms.rooms[room.id].addRaw('<hr /><h2><font color="green">' + user.name + ' ha iniciado una guerra por Alineaciones en formato ' + format + ' entre ' + Tools.escapeHTML(params[4]) + " y " + Tools.escapeHTML(params[5]) +  '.</font></h2><b><font color="orange">Capitanes de equipo: </font>' + userCapA.name + ' y ' + userCapB.name + '</font></b> <br /><b><font color="blueviolet">Jugadores por equipo:</font></b> ' + size + '<br /><font color="blue"><b>FORMATO:</b></font> ' + format + '<hr /><br /><b><font color="red">Recuerda que debes mantener tu nombre durante toda la duración del torneo.</font> <br />Los capitales deben usar /war reg, [miembro1], [miembro2]... para registrar las alineaciones.</b>');
 						break;
 					default:
@@ -650,7 +650,7 @@ var cmds = {
 			case 'reg':
 				var tourData = War.getTourData(roomId);
 				if (!tourData) return this.sendReply("No había ninguna guerra en esta sala");
-				if (toId(user.name) !== toId(tourData.authA) && toId(user.name) !== toId(tourData.authB)) return this.sendReply("Debes ser Capitan de uno de los dos clanes para hacer esto.");
+				if (toId(user.name) !== toId(tourData.authA) && toId(user.name) !== toId(tourData.authB)) return this.sendReply("Debes ser Capitan de uno de los dos gremios para hacer esto.");
 				var err = War.regParticipants(roomId, user.name, target);
 				if (err) return this.sendReply(err);
 				if (toId(user.name) === toId(tourData.authA)) Rooms.rooms[room.id].addRaw(user.name + ' ha registrado la alinación para ' + tourData.teamA + '.');
