@@ -2246,11 +2246,7 @@ var commands = exports.commands = {
 		if (!this.canBroadcast()) return false;
 		this.sendReplyBox(
 			"<b><u><center><big><big>Artículos</center></u></b><br /><br />" +
-			"<b>Plaza</b> - compra una plaza para el gremio al que se pertenece (1500 -> 3000 -> 6000 -> 10000 pds)<br />" 
-			"<b><br>Logo del gremio</b> - 3500 monedas. Si ya tienes uno podrás cambiarlo por 1500 monedas.<br />" 
-			"<b><br>Descripción del gremio</b> - 3500 monedas. Si ya tienes una podrás cambiarlo por 1500 monedas.<br />" 
-			"<b><br>Sala privada para el gremio</b> - sala privada para los miembros del gremio. 2500 monedas.<br />" 
-			"<b><br>Sala pública</b> - una vez adquirida la sala privada, se puede hacer pública por 5000 monedas.<br />"
+			"<b>Plaza</b> - compra una plaza para el gremio al que se pertenece (1500 -> 3000 -> 6000 -> 10000 pds)<br />"
 			);
 	},
 	
