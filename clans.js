@@ -1,5 +1,5 @@
-const clanDataFile = './config/clans.json';
-const warLogDataFile = './config/warlog.json';
+var clanDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'clans.json' : './config/clans.json';
+var warLogDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'warlog.json' : './config/warlog.json';
 
 var fs = require('fs');
 var elo = require('./elo.js')();

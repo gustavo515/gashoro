@@ -1,8 +1,8 @@
-const pdDataFile = './config/shopmoney.json';
-const tcDataFile = './config/tcards.json';
-const symbolsDataFile = './config/symbolauth.json';
-const avatarsDataFile = './config/shopavatars.json';
-const botPhraseDataFile = './config/botphrases.json';
+var pdDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'shopmoney.json' : './config/shopmoney.json';
+var tcDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'tcards.json' : './config/tcards.json';
+var symbolsDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'symbolauth.json' : './config/symbolauth.json';
+var avatarsDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'shopavatars.json' : './config/shopavatars.json';
+var botPhraseDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'botphrases.json' : './config/botphrases.json';
 
 var fs = require('fs');
 
