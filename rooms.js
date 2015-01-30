@@ -13,6 +13,9 @@ const TIMEOUT_EMPTY_DEALLOCATE = 10 * 60 * 1000;
 const TIMEOUT_INACTIVE_DEALLOCATE = 40 * 60 * 1000;
 const REPORT_USER_STATS_INTERVAL = 1000 * 60 * 10;
 
+var chatRoomsDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'chatrooms.json' : './config/chatrooms.json';
+var chatRoomsDataFile0 = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'chatrooms.json.0' : './config/chatrooms.json.0';
+
 var fs = require('fs');
 
 /* global Rooms: true */
@@ -109,7 +112,7 @@ var GlobalRoom = (function () {
 
 		this.chatRoomData = [];
 		try {
-			this.chatRoomData = JSON.parse(fs.readFileSync('config/chatrooms.json'));
+			this.chatRoomData = JSON.parse(fs.readFileSync(chatRoomsDataFile));
 			if (!Array.isArray(this.chatRoomData)) this.chatRoomData = [];
 		} catch (e) {} // file doesn't exist [yet]
 
@@ -198,12 +201,12 @@ var GlobalRoom = (function () {
 				}
 				writing = true;
 				var data = JSON.stringify(self.chatRoomData).replace(/\{"title"\:/g, '\n{"title":').replace(/\]$/, '\n]');
-				fs.writeFile('config/chatrooms.json.0', data, function () {
+				fs.writeFile(chatRoomsDataFile0, data, function () {
 					// rename is atomic on POSIX, but will throw an error on Windows
-					fs.rename('config/chatrooms.json.0', 'config/chatrooms.json', function (err) {
+					fs.rename(chatRoomsDataFile0, chatRoomsDataFile, function (err) {
 						if (err) {
 							// This should only happen on Windows.
-							fs.writeFile('config/chatrooms.json', data, finishWriting);
+							fs.writeFile(chatRoomsDataFile, data, finishWriting);
 							return;
 						}
 						finishWriting();
