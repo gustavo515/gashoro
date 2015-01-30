@@ -4,21 +4,21 @@ exports.commands = {
 		this.sendReplyBox("<a href=\"http://viridianradio.playtheradio.com/comments.cfm\">Viridian's Radio!</a>");
 	},
 
-	stafflist: 'authlist',
+        stafflist: 'authlist',
 	authlist: function (target, room, user, connection) {
 		var rankLists = {};
 		for (var u in Users.usergroups) {
 			var rank = Users.usergroups[u][0];
 			var name = Users.usergroups[u].slice(1);
 			if (!rankLists[rank]) rankLists[rank] = [];
+			if (name) name = name.replace("\n", "").replace("\r", "");
 			rankLists[rank].push(name);
 		}
-
 		var buffer = [];
 		Object.keys(rankLists).sort(function (a, b) {
-			return Config.groups.bySymbol[b].rank - Config.groups.bySymbol[a].rank;
+			return Config.groups[b].rank - Config.groups[a].rank;
 		}).forEach(function (r) {
-			buffer.push(Config.groups.bySymbol[r].name + "s (" + r + "):\n" + rankLists[r].sort().join(", "));
+			buffer.push(Config.groups[r].name + "s (" + r + "):\n" + rankLists[r].sort().join(", "));
 		});
 
 		if (!buffer.length) {
