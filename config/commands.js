@@ -1436,7 +1436,7 @@ var commands = exports.commands = {
 		this.sendReplyBox(
 			"<big><b>Comandos Básicos:</b></big><br /><br />" +
 			"/gremios - Lista los gremios.<br />" +
-			"/buy plaza - compra una plaza para el gremio al que se pertenece.<br />" +
+			"/comprarplaza - compra una plaza para el gremio al que se pertenece.<br />" +
 			"/gremio (gremio/miembro) - Muestra la ficha/perfil de un gremio.<br />" +
 			"/miembrosgremio (gremio/miembro) - muestra los miembros con los que cuenta un gremio.<br />" +
 			"/gremioauth (gremio/miembro) - muestra la jerarquía de miembros de un gremio.<br />" +
@@ -2242,13 +2242,43 @@ var commands = exports.commands = {
 	 *********************************************************/
 
 	mercado: 'shop',
-	shop: function () {
+	shop: function (target, room, user) {
 		if (!this.canBroadcast()) return false;
 		this.sendReplyBox(
 			"<b><u><center><big><big>Artículos (Tienda actualmente en construccion)</center></u></b><br /><br />" +
 			"<b>Plaza</b> - compra una plaza para el gremio al que se pertenece (1500 -> 3000 -> 6000 -> 10000 pds)<br />" +
 			"<b>Custom Avatar</b> - compra un customavatar para tu user permanente. (6000 pds)<br />"
 			);
+	},
+	
+	buyplace: 'comprarplaza',
+	comprarplaza: function (target, room, user) {
+		var clanUser = Clans.findClanFromMember(user.name);
+		if (!clanUser) {
+			return this.sendReply("No perteneces a ningún gremio.");
+		}
+		var perminsionvalue = Clans.authMember(clanUser, user.userid);
+		if (perminsionvalue <= 2 && !this.can('clans')) return false;
+		var places = Clans.getPlaces(clanUser);
+		var prize = 0;
+		if (places < 5) {
+			prize = 1500;
+		} else if (places < 6) {
+			prize = 3000;
+		} else if (places < 7) {
+			prize = 6000;
+		} else if (places === 7) {
+			prize = 10000;
+		} else {
+			return this.sendReply("Tu gremio ya posee 8 plazas.");
+		}
+		var coins = Clans.getRating(clanUser).rating;
+		if (coins < prize) return this.sendReply("Tu clan no tiene suficientes monedas.");
+		Clans.addPlaces(clanUser, 1);
+		places++;
+		Clans.setRanking(clanUser, coins - prize);
+		this.addModCommand(user.name + " ha comprado una plaza para el gremio " + clanUser + ".");
+		return this.sendReply("Has comprado una plaza para tu gremio, ahora tu gremio dispone de " + places + " plazas.");
 	},
 	
 	comprar: 'buy',
@@ -2258,30 +2288,7 @@ var commands = exports.commands = {
 		if (!params) return this.sendReply("Usage: /buy object");
 		var article = toId(params[0]);
 		switch (article) {
-			case 'plaza':
-				var clanUser = Clans.findClanFromMember(user.name);
-				if (!clanUser) {
-					return this.sendReply("No perteneces a ningún gremio.");
-				}
-				var places = Clans.getPlaces(clanUser);
-				if (places < 5) {
-					prize = 1500;
-				} else if (places < 6) {
-					prize = 3000;
-				} else if (places < 7) {
-					prize = 6000;
-				} else if (places === 7) {
-					prize = 10000;
-				} else {
-					return this.sendReply("Tu gremio ya posee 8 plazas.");
-				}
-				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
-				Clans.addPlaces(clanUser, 1);
-				places++;
-				Shop.removeMoney(user.name, prize);
-				return this.sendReply("Has comprado una plaza para tu gremio, ahora tu gremio dispone de " + places + " plazas.");
-				break; 
-				case 'customtc':
+			case 'customtc':
 				prize = 8000;
 				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
 				var tcUser = Shop.getTrainerCard(user.name);
