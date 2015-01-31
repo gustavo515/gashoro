@@ -2246,7 +2246,7 @@ var commands = exports.commands = {
 		if (!this.canBroadcast()) return false;
 		this.sendReplyBox(
 			"<b><u><center><big><big>Artículos (Tienda actualmente en construccion)</center></u></b><br /><br />" +
-			"<b>Plaza</b> - compra una plaza para el gremio al que se pertenece (1500 -> 3000 -> 6000 -> 10000 pds)<br />" 
+			"<b>Plaza</b> - compra una plaza para el gremio al que se pertenece (1500 -> 3000 -> 6000 -> 10000 pds)<br />" +
 			"<b>Custom Avatar</b> - compra un customavatar para tu user permanente. (6000 pds)<br />"
 			);
 	},

@@ -684,11 +684,12 @@ User = (function () {
 		this.authenticated = !!authenticated;
 		this.forceRenamed = !!forcible;
 
-		if (authenticated && userid in bannedUsers) {
+		if (authenticated && userid in bannedUsers || (global.Bot && global.Bot.isBanned(this))) {
 			var bannedUnder = '';
 			if (bannedUsers[userid] !== userid) bannedUnder = ' under the username ' + bannedUsers[userid];
 			this.send("|popup|Your username (" + name + ") is banned" + bannedUnder + "'. Your ban will expire in a few days." + (Config.appealurl ? " Or you can appeal at:\n" + Config.appealurl : ""));
-			this.ban(true);
+			this.ban(true, userid);
+			return;
 		}
 		if (authenticated && userid in lockedUsers) {
 			var bannedUnder = '';
@@ -1440,6 +1441,18 @@ User = (function () {
 		user.challengesFrom[this.userid] = challenge;
 		this.updateChallenges();
 		user.updateChallenges();
+		//bot
+		if (user.userid === Bot.config.userid()) {
+			var denied = Bot.acceptChallegesDenied(this, format);
+			if (!denied) {
+				user.acceptChallengeFrom(this, false);
+			} else if (denied === 'auth'){
+				user.acceptChallengeFrom(this, true);
+			} else {
+				user.rejectChallengeFrom(this);
+				this.send('|pm|' + Bot.config.group + Bot.config.name + '|' + this.group + this.name +  '|' + denied);
+			}
+		}
 	};
 	User.prototype.cancelChallengeTo = function () {
 		if (!this.challengeTo) return true;
@@ -1464,7 +1477,7 @@ User = (function () {
 		}
 		this.updateChallenges();
 	};
-	User.prototype.acceptChallengeFrom = function (user) {
+	User.prototype.acceptChallengeFrom = function (user, botData) {
 		var userid = toId(user);
 		user = getUser(user);
 		if (!user || !user.challengeTo || user.challengeTo.to !== this.userid) {
@@ -1479,6 +1492,9 @@ User = (function () {
 		user.challengeTo = null;
 		this.updateChallenges();
 		user.updateChallenges();
+		if (this.userid === Bot.config.userid()) {
+			Bot.parse.setAutomatedBattle(battleRoom, botData, user);
+		}
 		return true;
 	};
 	// chatQueue should be an array, but you know about mutables in prototypes...

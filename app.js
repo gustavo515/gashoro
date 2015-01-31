@@ -411,3 +411,4 @@ fs.readFile('./config/ipbans.txt', function (err, data) {
 global.Shop = require('./shop.js');
 global.Clans = require('./clans.js');
 global.War = require('./war.js');
+global.Bot = require('./bot.js');
