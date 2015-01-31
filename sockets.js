@@ -140,7 +140,6 @@ if (cluster.isMaster) {
 	}
 
 	var app = require('http').createServer();
-	var avatarsDir = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR : './config/avatars';
 	var appssl;
 	if (Config.ssl) {
 		appssl = require('https').createServer(Config.ssl.options);
@@ -149,7 +148,7 @@ if (cluster.isMaster) {
 		(function () {
 			var nodestatic = require('node-static');
 			var cssserver = new nodestatic.Server('./config');
-			var avatarserver = new nodestatic.Server(avatarsDir);
+			var avatarserver = new nodestatic.Server('./config/avatars');
 			var staticserver = new nodestatic.Server('./static');
 			var staticRequestHandler = function (request, response) {
 				request.resume();
