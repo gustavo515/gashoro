@@ -61,7 +61,7 @@ if (!botBannedWords.links) {
 }
 
 var config = {
-	name: 'Suicuen Bot',
+	name: 'Suicune Bot',
 	userid: function () {
 		return toId(this.name);
 	},
