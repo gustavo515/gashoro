@@ -66,7 +66,7 @@ var config = {
 		return toId(this.name);
 	},
 	group: '&',
-	customavatars: 'suicunebot.gif',
+	customavatars: 'suicunebot.png',
 	rooms: ['lobby'],
 	punishvals: {
 		1: 'warn',
