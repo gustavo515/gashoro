@@ -2245,8 +2245,9 @@ var commands = exports.commands = {
 	shop: function () {
 		if (!this.canBroadcast()) return false;
 		this.sendReplyBox(
-			"<b><u><center><big><big>Artículos</center></u></b><br /><br />" +
-			"<b>Plaza</b> - compra una plaza para el gremio al que se pertenece (1500 -> 3000 -> 6000 -> 10000 pds)<br />"
+			"<b><u><center><big><big>Artículos (Tienda actualmente en construccion)</center></u></b><br /><br />" +
+			"<b>Plaza</b> - compra una plaza para el gremio al que se pertenece (1500 -> 3000 -> 6000 -> 10000 pds)<br />" 
+			"<b>Custom Avatar</b> - compra un customavatar para tu user permanente. (6000 pds)<br />"
 			);
 	},
 	
@@ -2279,6 +2280,78 @@ var commands = exports.commands = {
 				places++;
 				Shop.removeMoney(user.name, prize);
 				return this.sendReply("Has comprado una plaza para tu gremio, ahora tu gremio dispone de " + places + " plazas.");
+				break; 
+				case 'customtc':
+				prize = 8000;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				var tcUser = Shop.getTrainerCard(user.name);
+				if (!tcUser) {
+					Shop.giveTrainerCard(user.name);
+					tcUser = Shop.getTrainerCard(user.name);
+				}
+				if (tcUser.customTC) return this.sendReply("Ya poseías este artículo.");
+				Shop.setCustomTrainerCard(user.name, true);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has comprado una Tarjeta de entreador personalizada. Consulta /shophelp para más información.");
+				break;
+			case 'tc':
+				prize = 3000;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				var tcUser = Shop.getTrainerCard(user.name);
+				if (tcUser) return this.sendReply("Ya poseías este artículo.");
+				Shop.giveTrainerCard(user.name);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has comprado una Tarjeta de Entrenador. Revisa /shophelp para saber como editarla.");
+				break;
+			case 'sprite':
+				prize = 100;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				var tcUser = Shop.getTrainerCard(user.name);
+				if (!tcUser) return this.sendReply("Necesitas comprar primero una Tarjeta de entrenador.");
+				if (tcUser.nPokemon > 5) return this.sendReply("Ya tienes 6 Pokemon para tu tarjeta de entrenador.");
+				if (tcUser.customTC) return this.sendReply("Tu tarjeta es Personalizada. Usa /tchtml pata modificarla.");
+				Shop.nPokemonTrainerCard(user.name, tcUser.nPokemon + 1);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has comprado un Sprite de un pokemon para tu TC. Revisa /shophelp para más información.");
+				break;
+			case 'symbol':
+				prize = 4000;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				if (Shop.symbolPermision(user.name)) return this.sendReply("Ya posees este artículo.");
+				Shop.setSymbolPermision(user.name, true);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has comprado el permiso para usar los comandos /customsymbol y /resetsymbol. Para más información consulta /shophelp.");
+				break;
+			case 'avatar':
+				prize = 1000;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				if (!Config.customAvatars[user.userid]) return this.sendReply("No tenías un avatar personalizado.");
+				if (params.length !== 2) return this.sendReply("Usa el comando así: /buy avatar,[imagen]");
+				var err = Shop.addPendingAvatar(user.userid, params[1]);
+				if (err) return this.sendReply(err);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has solicitado un cambio de tu avatar personalizado. Espera a que un admin revise tu compra.");
+				break;
+			case 'customavatar':
+				prize = 6000;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				if (Config.customAvatars[user.userid]) return this.sendReply("Ya habías comprado este artículo. Para cambiar tu avatar compra la opcion Avatar");
+				if (params.length !== 2) return this.sendReply("Usa el comando así: /buy avatar,[imagen]");
+				var err = Shop.addPendingAvatar(user.userid, params[1]);
+				if (err) return this.sendReply(err);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has solicitado un avatar personalizado. Espera a que un admin revise tu compra.");
+				break;
+			case 'botphrase':
+				prize = 1500;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				if (Shop.getBotPhrase(user.name)) return this.sendReply("Ya posees este articulo.");
+				if (params.length < 2) return this.sendReply("Usa el comando así: /buy botphrase, [texto]");
+				if (toId(params[1]) === 'off') return this.sendReply("Usa el comando así: /buy botphrase, [texto]");
+				if (params[1].length > 150) return this.sendReply("La frase es demasiado larga. Debe ser menor a 150 caracteres.");
+				Shop.changeBotPhrase(user.name, Tools.escapeHTML(target.substr(params[0].length + 1)));
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has comprado una frase personalizada para el comando .whois del Bot. Puedes cambiarla tantas veces como quieras con /botphrase.");
 				break;
 			default:
 				return this.sendReply("No has especificado ningún artículo válido.");
