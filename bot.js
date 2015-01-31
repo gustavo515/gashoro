@@ -61,18 +61,17 @@ if (!botBannedWords.links) {
 }
 
 var config = {
-	name: 'Ultimate Bot',
+	name: 'Suicuen Bot',
 	userid: function () {
 		return toId(this.name);
 	},
-	group: '@',
-	customavatars: 'ultimatebot.gif',
+	group: '&',
+	customavatars: 'suicunebot.gif',
 	rooms: ['lobby'],
 	punishvals: {
 		1: 'warn',
 		2: 'mute',
 		3: 'hourmute',
-		4: 'hourmute',
 		5: 'lock'
 	},
 	privaterooms: ['staff'],
