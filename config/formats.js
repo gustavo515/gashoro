@@ -605,13 +605,6 @@ exports.Formats = [
 		ruleset: ['OU']
 	},
 	{
-		name: "Drastic Tier Shift",
-		section: "Ultimate",
-
-		mod: 'drasticshift',
-		ruleset: ['OU']
-	},
-	{
 		name: "PU",
 		section: "Other Metagames",
 
@@ -799,6 +792,105 @@ exports.Formats = [
 		ruleset: ['Pokemon', 'Standard NEXT', 'Team Preview'],
 		banlist: ['Uber']
 	},
+	
+	// Ultimate
+	///////////////////////////////////////////////////////////////////
+	{
+		name: "Drastic Tier Shift",
+		section: "Ultimate",
+		column: 3,
+
+		mod: 'drasticshift',
+		ruleset: ['OU']
+	},
+	
+	// Random Metagames
+	///////////////////////////////////////////////////////////////////
+
+	{
+		name: "Random Monotype",
+		section: "Random Metagames",
+		column: 3,
+
+		searchShow: true,
+		team: 'randomMonoType',
+		ruleset: ['PotD', 'Pokemon', 'Sleep Clause Mod', 'HP Percentage Mod']
+	},
+	{
+		name: "Random Haxmons",
+		section: "Random Metagames",
+
+		searchShow: true,
+		team: 'random',
+		ruleset: ['Pokemon', 'HP Percentage Mod', 'Sleep Clause Mod', 'Freeze Clause'],
+		onModifyMovePriority: -100,
+		onModifyMove: function (move) {
+			if (move.accuracy !== true && move.accuracy < 100) move.accuracy = 0;
+			move.willCrit = true;
+			if (move.secondaries) {
+				for (var i = 0; i < move.secondaries.length; i++) {
+					move.secondaries[i].chance = 100;
+				}
+			}
+		}
+	},
+	{
+		name: "Random Sky Battle",
+		section: "Random Metagames",
+
+		searchShow: true,
+		team: 'randomSky',
+		ruleset: ['PotD', 'Pokemon', 'Sleep Clause Mod', 'HP Percentage Mod']
+	},
+	{
+		name: "Random Ubers",
+		section: "Random Metagames",
+
+		searchShow: true,
+		team: 'randomUber',
+		ruleset: ['PotD', 'Pokemon', 'Sleep Clause Mod', 'HP Percentage Mod']
+	},
+	{
+		name: "Random LC",
+		section: "Random Metagames",
+
+		searchShow: true,
+		team: 'randomLC',
+		ruleset: ['PotD', 'Pokemon', 'Sleep Clause Mod', 'HP Percentage Mod']
+	},
+	{
+		name: "Random CAP",
+		section: "Random Metagames",
+
+		searchShow: true,
+		team: 'randomCap',
+		ruleset: ['PotD', 'Pokemon', 'Sleep Clause Mod', 'HP Percentage Mod']
+	},
+	{
+		name: "Challenge Cup 2-vs-2",
+		section: "Random Metagames",
+
+		gameType: 'doubles',
+		team: 'randomCC',
+		searchShow: true,
+		ruleset: ['Pokemon', 'Team Preview 2v2', 'HP Percentage Mod'],
+		onBegin: function () {
+			this.debug('Cutting down to 2');
+			this.p1.pokemon = this.p1.pokemon.slice(0, 2);
+			this.p1.pokemonLeft = this.p1.pokemon.length;
+			this.p2.pokemon = this.p2.pokemon.slice(0, 2);
+			this.p2.pokemonLeft = this.p2.pokemon.length;
+		}
+	},
+	{
+		name: "Challenge Cup Metronome",
+		section: "Random Metagames",
+
+		searchShow: true,
+		team: 'randomMetro',
+		ruleset: ['Pokemon', 'HP Percentage Mod']
+	},
+	
 
 	// BW2 Singles
 	///////////////////////////////////////////////////////////////////
@@ -806,7 +898,7 @@ exports.Formats = [
 	{
 		name: "[Gen 5] OU",
 		section: "BW2 Singles",
-		column: 3,
+		column: 4,
 
 		mod: 'gen5',
 		ruleset: ['Pokemon', 'Standard', 'Evasion Abilities Clause', 'Team Preview'],
@@ -892,7 +984,7 @@ exports.Formats = [
 	{
 		name: "[Gen 5] Smogon Doubles",
 		section: 'BW2 Doubles',
-		column: 3,
+		column: 4,
 
 		mod: 'gen5',
 		gameType: 'doubles',
@@ -951,7 +1043,7 @@ exports.Formats = [
 	{
 		name: "[Gen 4] OU",
 		section: "Past Generations",
-		column: 3,
+		column: 4,
 
 		mod: 'gen4',
 		ruleset: ['Pokemon', 'Standard'],
