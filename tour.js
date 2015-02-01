@@ -905,6 +905,7 @@ var cmds = {
 	survey: 'poll',
 	poll: function(target, room, user) {
 		if (!tour.lowauth(user,room)) return this.sendReply('No tienes suficiente poder para utilizar este comando.');
+		if (!tour[room.id]) return this.sendReply('Esto no puede ser usado en usa sala recien creada. Un admin debe usar /newtour update.');
 		if (tour[room.id].question) return this.sendReply('Ya hay una encuesta en curso.');
 		var separacion = "&nbsp;&nbsp;";
 		var answers = tour.splint(target);
@@ -928,6 +929,7 @@ var cmds = {
 
 	vote: function(target, room, user) {
 		var ips = JSON.stringify(user.ips);
+		if (!tour[room.id]) return this.sendReply('Esto no puede ser usado en usa sala recien creada. Un admin debe usar /newtour update.');
 		if (!tour[room.id].question) return this.sendReply('No hay encuestas en curso.');
 		if (tour[room.id].answerList.indexOf(target.toLowerCase()) == -1) return this.sendReply('\'' + target + '\' no es una opcion en esta encuesta.');
 		tour[room.id].answers[ips] = target.toLowerCase();
@@ -943,6 +945,7 @@ var cmds = {
 	ep: 'endpoll',
 	endpoll: function(target, room, user) {
 		if (!tour.lowauth(user,room)) return this.sendReply('No tienes suficiente poder para utilizar este comando.');
+		if (!tour[room.id]) return this.sendReply('Esto no puede ser usado en usa sala recien creada. Un admin debe usar /newtour update.');
 		if (!tour[room.id].question) return this.sendReply('No hay encuestas en curso en esta sala.');
 		var votes = Object.keys(tour[room.id].answers).length;
 		this.logModCommand(user.name + ' ha cancelado la encuesta.');
@@ -980,6 +983,7 @@ var cmds = {
 	pollremind: 'pr',
 	pr: function(target, room, user) {
 		var separacion = "&nbsp;&nbsp;";
+		if (!tour[room.id]) return this.sendReply('Esto no puede ser usado en usa sala recien creada. Un admin debe usar /newtour update.');
 		if (!tour[room.id].question) return this.sendReply('No hay encuestas en curso.');
 		if (!this.canBroadcast()) return;
 		var pollOptions = '';
