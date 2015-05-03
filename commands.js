@@ -266,26 +266,7 @@ var commands = exports.commands = {
 		return this.sendReply("The room '" + target + "' isn't registered.");
 	},
 	deregisterchatroomhelp: ["/deregisterchatroom [roomname] - Deletes room [roomname] after the next server restart. Requires: ~"],
-
-	hideroom: 'privateroom',
-	hiddenroom: 'privateroom',
-	privateroom: function (target, room, user, connection, cmd) {
-		var setting;
-		switch (cmd) {
-		case 'privateroom':
-			if (!this.can('makeroom')) return;
-			setting = true;
-			break;
-		default:
-			if (!this.can('privateroom', null, room)) return;
-			if (room.isPrivate === true) {
-				if (this.can('makeroom'))
-					this.sendReply("This room is a secret room. Use /privateroom to toggle instead.");
-				return;
-			}
-			setting = 'hidden';
-			break;
-		}
+	
 	hideroom: 'privateroom',
 	hiddenroom: 'privateroom',
 	privateroom: function (target, room, user, connection, cmd) {

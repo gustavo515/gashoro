@@ -62,6 +62,8 @@ var commands = exports.commands = {
 		if (targetUser.isSysop) {
 			this.sendReply("(Pok\xE9mon Showdown System Operator)");
 		}
+		if (Config.sysOps && Config.sysOps[targetUser.userid]) this.sendReply("(System Operator)");
+		if (Config.superAdmins && Config.superAdmins[targetUser.userid]) this.sendReply("(Super Administrator)");
 		if (!targetUser.registered) {
 			this.sendReply("(Unregistered)");
 		}

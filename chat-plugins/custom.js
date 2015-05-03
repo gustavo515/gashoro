@@ -478,33 +478,7 @@
 	logogremio: function (target, room, user) {
 		if (!this.can('clans')) return false;
 		var permisionClan = false;
-		if (!target)connected) return this.sendReply("Usuario: " + params[0] + " no existe o no está disponible.");
-		if (clanTarget) {
-			var clanId = toId(clanTarget);
-			var userId = toId(params[0]);
-			if ((Clans.authMember(clanId, userId) > 2 && !this.can('clans')) || (Clans.authMember(clanId, userId) === 2 && perminsionValue < 3 && !this.can('clans'))) return false;
-		}
-		if (!Clans.addOficial(params[0]))
-			this.sendReply("El usuario no existe, no pertenece a ningún clan o ya era oficial de su gremio.");
-		else {
-			this.sendReply("Usuario: " + userk.name + " nombrado correctamente oficial del clan " + clanTarget + ".");
-			userk.popup(user.name + " te ha nombrado Oficial del gremio " + clanTarget + ".\nUtiliza el comando /ayudagremios para más información.");
-		}
-	},
-	
-	sublider: function (target, room, user) {
-		var permisionClan = false;
-		var params = target.split(',');
-		if (!params) {
-				return this.sendReply("Usage: /sublider member");
-		}
-		var clanUser = Clans.findClanFromMember(user.name);
-		var clanTarget = Clans.findClanFromMember(params[0]);
-		if (clanUser) {
-			var clanUserid = toId(clanUser);
-			var userb = toId(params[0]);
-			var iduserwrit = toId(user.name);
-			var perminsionVal return this.sendReply("Debe especificar un logo.");
+		if (!target) return this.sendReply("Debe especificar un logo.");
 		var clanUser = Clans.findClanFromMember(user.name);
 		if (clanUser) {
 			var clanUserid = toId(clanUser);
@@ -612,7 +586,33 @@
 		}
 		if (!permisionClan && !this.can('clans')) return;
 		var userk = Users.getExact(params[0]);
-		if (!userk || !userk.ue = Clans.authMember(clanUserid, iduserwrit);
+		if (!userk || !userk.connected) return this.sendReply("Usuario: " + params[0] + " no existe o no está disponible.");
+		if (clanTarget) {
+			var clanId = toId(clanTarget);
+			var userId = toId(params[0]);
+			if ((Clans.authMember(clanId, userId) > 2 && !this.can('clans')) || (Clans.authMember(clanId, userId) === 2 && perminsionValue < 3 && !this.can('clans'))) return false;
+		}
+		if (!Clans.addOficial(params[0]))
+			this.sendReply("El usuario no existe, no pertenece a ningún clan o ya era oficial de su gremio.");
+		else {
+			this.sendReply("Usuario: " + userk.name + " nombrado correctamente oficial del clan " + clanTarget + ".");
+			userk.popup(user.name + " te ha nombrado Oficial del gremio " + clanTarget + ".\nUtiliza el comando /ayudagremios para más información.");
+		}
+	},
+	
+	sublider: function (target, room, user) {
+		var permisionClan = false;
+		var params = target.split(',');
+		if (!params) {
+				return this.sendReply("Usage: /sublider member");
+		}
+		var clanUser = Clans.findClanFromMember(user.name);
+		var clanTarget = Clans.findClanFromMember(params[0]);
+		if (clanUser) {
+			var clanUserid = toId(clanUser);
+			var userb = toId(params[0]);
+			var iduserwrit = toId(user.name);
+			var perminsionValue = Clans.authMember(clanUserid, iduserwrit);
 			if (perminsionValue === 3 && clanTarget === clanUser) permisionClan = true;
 		}
 		if (!permisionClan && !this.can('clans')) return;
@@ -893,7 +893,7 @@
 	openroom: function (target, room, user) {
 		var permisionClan = false;
 		var clanRoom = Clans.findClanFromRoom(room.id);
-		if (!clanRoom) return this.sendReply("Esta no es una sala de Gremio.");
+		if (!clanRoom) return this.sendReply("Esta no es una sala de Clan.");
 		var clanUser = Clans.findClanFromMember(user.name);
 		if (clanUser && toId(clanRoom) === toId(clanUser)) {
 			var clanUserid = toId(clanUser);
@@ -936,10 +936,10 @@
 		if (!this.canBroadcast()) return false;
 		this.sendReplyBox(
 			"<b><u><center><big><big>Artículos (Tienda actualmente en construccion)</center></u></b><br /><br />" +
-            "<b><br>Custom Avatar</b> - compra un customavatar para tu user permanente. (7000 pds)<br />" + 
-            "<b><br>Symbol</b> - compra un custom symbol para que aparezca al lado de tu nick (Se quita en restart) (3500 pds)<br />"			
+			"<b>Plaza</b> - compra una plaza para el gremio al que se pertenece (1500 -> 3000 -> 6000 -> 10000 pds)<br />" +
+			"<b>Custom Avatar</b> - compra un customavatar para tu user permanente. (6000 pds)<br />"
 			);
-	}, 
+	},
 	
 	buyplace: 'comprarplaza',
 	comprarplaza: function (target, room, user) {
@@ -978,8 +978,59 @@
 		if (!params) return this.sendReply("Usage: /buy object");
 		var article = toId(params[0]);
 		switch (article) {
-            case 'customavatar':
-				prize = 7000;
+			case 'customtc':
+				prize = 8000;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				var tcUser = Shop.getTrainerCard(user.name);
+				if (!tcUser) {
+					Shop.giveTrainerCard(user.name);
+					tcUser = Shop.getTrainerCard(user.name);
+				}
+				if (tcUser.customTC) return this.sendReply("Ya poseías este artículo.");
+				Shop.setCustomTrainerCard(user.name, true);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has comprado una Tarjeta de entreador personalizada. Consulta /shophelp para más información.");
+				break;
+			case 'tc':
+				prize = 3000;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				var tcUser = Shop.getTrainerCard(user.name);
+				if (tcUser) return this.sendReply("Ya poseías este artículo.");
+				Shop.giveTrainerCard(user.name);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has comprado una Tarjeta de Entrenador. Revisa /shophelp para saber como editarla.");
+				break;
+			case 'sprite':
+				prize = 100;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				var tcUser = Shop.getTrainerCard(user.name);
+				if (!tcUser) return this.sendReply("Necesitas comprar primero una Tarjeta de entrenador.");
+				if (tcUser.nPokemon > 5) return this.sendReply("Ya tienes 6 Pokemon para tu tarjeta de entrenador.");
+				if (tcUser.customTC) return this.sendReply("Tu tarjeta es Personalizada. Usa /tchtml pata modificarla.");
+				Shop.nPokemonTrainerCard(user.name, tcUser.nPokemon + 1);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has comprado un Sprite de un pokemon para tu TC. Revisa /shophelp para más información.");
+				break;
+			case 'symbol':
+				prize = 4000;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				if (Shop.symbolPermision(user.name)) return this.sendReply("Ya posees este artículo.");
+				Shop.setSymbolPermision(user.name, true);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has comprado el permiso para usar los comandos /customsymbol y /resetsymbol. Para más información consulta /shophelp.");
+				break;
+			case 'avatar':
+				prize = 1000;
+				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
+				if (!Config.customAvatars[user.userid]) return this.sendReply("No tenías un avatar personalizado.");
+				if (params.length !== 2) return this.sendReply("Usa el comando así: /buy avatar,[imagen]");
+				var err = Shop.addPendingAvatar(user.userid, params[1]);
+				if (err) return this.sendReply(err);
+				Shop.removeMoney(user.name, prize);
+				return this.sendReply("Has solicitado un cambio de tu avatar personalizado. Espera a que un admin revise tu compra.");
+				break;
+			case 'customavatar':
+				prize = 6000;
 				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
 				if (Config.customAvatars[user.userid]) return this.sendReply("Ya habías comprado este artículo. Para cambiar tu avatar compra la opcion Avatar");
 				if (params.length !== 2) return this.sendReply("Usa el comando así: /buy avatar,[imagen]");
@@ -987,15 +1038,18 @@
 				if (err) return this.sendReply(err);
 				Shop.removeMoney(user.name, prize);
 				return this.sendReply("Has solicitado un avatar personalizado. Espera a que un admin revise tu compra.");
-				break; 
-            case 'symbol':
-				prize = 3500;
+				break;
+			case 'botphrase':
+				prize = 1500;
 				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
-				if (Shop.symbolPermision(user.name)) return this.sendReply("Ya posees este artículo.");
-				Shop.setSymbolPermision(user.name, true);
+				if (Shop.getBotPhrase(user.name)) return this.sendReply("Ya posees este articulo.");
+				if (params.length < 2) return this.sendReply("Usa el comando así: /buy botphrase, [texto]");
+				if (toId(params[1]) === 'off') return this.sendReply("Usa el comando así: /buy botphrase, [texto]");
+				if (params[1].length > 150) return this.sendReply("La frase es demasiado larga. Debe ser menor a 150 caracteres.");
+				Shop.changeBotPhrase(user.name, Tools.escapeHTML(target.substr(params[0].length + 1)));
 				Shop.removeMoney(user.name, prize);
-				return this.sendReply("Has comprado el permiso para usar los comandos /customsymbol y /resetsymbol. Para más información consulta /shophelp.");
-				break;				
+				return this.sendReply("Has comprado una frase personalizada para el comando .whois del Bot. Puedes cambiarla tantas veces como quieras con /botphrase.");
+				break;
 			default:
 				return this.sendReply("No has especificado ningún artículo válido.");
 		}
@@ -1081,7 +1135,7 @@
 		} else {
 			this.sendReply('Has donado ' + pds + ' pd al usuario ' + userName + '.');
 		}
-	}, 
+	},
 	
 	symbolpermision: function (target, room, user) {
 		if (!this.can('givemoney')) return false;

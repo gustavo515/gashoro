@@ -29,15 +29,6 @@ exports.Formats = [
 		searchShow: false,
 		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Swagger Clause', 'Baton Pass Clause'],
 		banlist: ['Uber', 'Soul Dew', 'Gengarite', 'Kangaskhanite', 'Lucarionite', 'Mawilite', 'Salamencite']
-	}, 
-	{
-		name: "OU (no Mega)",
-		section: "ORAS Singles",
-
-		ruleset: ['OU'],
-		onModifyPokemon: function (pokemon) {
-			pokemon.canMegaEvo = false;
-		}
 	},
 	{
 		name: "OU (suspect test)",
@@ -79,13 +70,6 @@ exports.Formats = [
 		banlist: ['OU', 'BL', 'Alakazite', 'Altarianite', 'Diancite', 'Heracronite', 'Galladite', 'Gardevoirite', 'Lopunnite', 'Medichamite',
 			'Metagrossite', 'Pinsirite', 'Drizzle', 'Drought', 'Shadow Tag'
 		]
-	}, 
-	{
-		name: "UU (no Scald)",
-		section: "ORAS Singles",
-
-		ruleset: ['UU'],
-		banlist: ['Scald']
 	},
 	{
 		name: "RU",
@@ -166,7 +150,7 @@ exports.Formats = [
 		name: "Custom Game",
 		section: "ORAS Singles",
 
-		searchShow: true,
+		searchShow: false,
 		canUseRandomTeam: true,
 		debug: true,
 		maxLevel: 9999,
@@ -344,6 +328,7 @@ exports.Formats = [
 	{
 		name: "[Seasonal] Super Staff Bros.",
 		section: "OM of the Month",
+
 		team: 'randomSeasonalStaff',
 		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod'],
 		onBegin: function () {
@@ -1004,14 +989,6 @@ exports.Formats = [
 			if (name === 'bloobblob') {
 				this.add('c|%bloobblob|Contract?');
 			}
-			if (name === 'feliburn') {
-				this.add('c|%Feliburn|Come on!');
-			}
-			if (name === 'jellicent') {
-				this.add('c|%Jellicent|~(^.^)~');
-			}
-			if (name === 'hugendugen') {
-				this.add("c|%Hugendugen|4-1-0 let's go for it");
 			if (name === 'charlescarmichael') {
 				this.add('c|%Charles Carmichael|If Taylor Swift were in a Fast and Furious movie, it’d be called Taylor Drift.');
 			}
@@ -1654,6 +1631,7 @@ exports.Formats = [
 					pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
 				}
 			}
+
 			// Transform
 			if (pokemon.originalName) pokemon.name = pokemon.originalName;
 		},
@@ -1777,6 +1755,7 @@ exports.Formats = [
 					pokemon.name = target.name;
 				};
 			}
+
 			var name = toId(pokemon.illusion && move.sourceEffect === 'allyswitch' ? pokemon.illusion.name : pokemon.name);
 			// Prevent visual glitch with Spell Steal.
 			move.effectType = 'Move';
@@ -3358,7 +3337,7 @@ exports.Formats = [
 				};
 			}
 		}
-	}, 
+	},
 	{
 		name: "CAP",
 		section: "Other Metagames",
@@ -4069,22 +4048,6 @@ exports.Formats = [
 		banlist: ['Uber', 'OU', 'BL']
 	},
 	{
-		name: "[Gen 4] UU Hispana",
-		section: "Past Generations",
-
-		mod: 'gen4',
-		ruleset: ['Pokemon', 'Standard'],
-		banlist: ['Uber', 'Abomasnow', 'Aerodactyl', 'Alakazam', 'Azelf', 'Blissey', 'Breloom' , 'Bronzong', 'Celebi', 'Cresselia', 'Crobat', 'Dragonite', 'Dusknoir', 'Electivire', 'Empoleon', 'Flygon', 'Forretress', 'Gallade', 'Gengar', 'Gliscor', 'Gyarados', 'Heatran', 'Heracross', 'Hippowdon', 'Honchkrow', 'Infernape', 'Jirachi', 'Jolteon', 'Kingdra', 'Lucario', 'Machamp', 'Magnezone', 'Mamoswine', 'Metagross', 'Ninjask', 'Porygon-Z' , 'Raikou', 'Rhyperior', 'Roserade', 'Rotom-Frost', 'Rotom-Mow', 'Rotom-Heat', 'Rotom-Fan', 'Rotom-Wash', 'Scizor', 'Shaymin', 'Skarmory', 'Smeargle', 'Snorlax', 'Staraptor', 'Starmie' , 'Suicune', 'Swampert', 'Tentacruel', 'Togekiss', 'Tyranitar', 'Vaporeon', 'Weavile', 'Wynaut', 'Yanmega', 'Zapdos']
-	},
-	{
-		name: "[Gen 4] NU Hispana",
-		section: "Past Generations",
-
-		mod: 'gen4',
-		ruleset: ['Pokemon', 'Standard'],
-		banlist: ['Uber', 'Abomasnow', 'Aerodactyl', 'Alakazam', 'Azelf', 'Blissey', 'Breloom' , 'Bronzong', 'Celebi', 'Cresselia', 'Crobat', 'Dragonite', 'Dusknoir', 'Electivire', 'Empoleon', 'Flygon', 'Forretress', 'Gallade', 'Gengar', 'Gliscor', 'Gyarados', 'Heatran', 'Heracross', 'Hippowdon', 'Honchkrow', 'Infernape', 'Jirachi', 'Jolteon', 'Kingdra', 'Lucario', 'Machamp', 'Magnezone', 'Mamoswine', 'Metagross', 'Ninjask', 'Porygon-Z' , 'Raikou', 'Rhyperior', 'Roserade', 'Rotom-Frost', 'Rotom-Mow', 'Rotom-Heat', 'Rotom-Fan', 'Rotom-Wash', 'Scizor', 'Shaymin', 'Skarmory', 'Smeargle', 'Snorlax', 'Staraptor', 'Starmie' , 'Suicune', 'Swampert', 'Tentacruel', 'Togekiss', 'Tyranitar', 'Vaporeon', 'Weavile', 'Wynaut', 'Yanmega', 'Zapdos', 'Aggron', 'Absol', 'Altaria', 'Ambipom', 'Arcanine', 'Azumarill', 'Blastoise', 'Blaziken', 'Charizard', 'Chansey', 'Claydol', 'Clefable', 'Cloyster', 'Drapion', 'Donphan', 'Drifblim', 'Dugtrio', 'Entei', 'Espeon', 'Exeggutor', 'Feraligatr', 'Froslass', 'Gardevoir', 'Hariyama', 'Hippopotas', 'Hitmontop', 'Hitmonlee', 'Houndoom', 'Jumpluff', 'Kabutops', 'Kangaskhan', 'Lanturn', 'Leafeon', 'Linoone', 'Ludicolo', 'Magmortar', 'Manectric', 'Marowak', 'Medicham', 'Mesprit', 'Milotic', 'Miltank', 'Mismagius', 'Moltres', 'Nidoking', 'Nidoqueen', 'Omastar', 'Pinsir', 'Poliwrath', 'Porygon2', 'Primeape', 'Qwilfish', 'Rampardos', 'Regirock', 'Registeel', 'Relicanth', 'Rotom', 'Sceptile', 'Scyther', 'Slaking', 'Snover', 'Slowbro', 'Spiritomb', 'Steelix', 'Swellow', 'Tangrowth', 'Tauros', 'Torterra', 'Toxicroak', 'Umbreon', 'Ursaring', 'Uxie', 'Venomoth', 'Venusaur', 'Weezing', 'Zangoose']
-	},
-	{
 		name: "[Gen 4] LC",
 		section: "Past Generations",
 
@@ -4184,34 +4147,6 @@ exports.Formats = [
 		mod: 'gen1',
 		team: 'random',
 		ruleset: ['Pokemon', 'Sleep Clause Mod', 'Freeze Clause Mod', 'HP Percentage Mod', 'Cancel Mod']
-	},
-	{
-		name: "[Gen 1] OU",
-		section: "Past Generations",
-
-		mod: 'gen1',
-		ruleset: ['Pokemon', 'Standard'],
-		banlist: ['Uber']
-	},
-	{
-		name: "[Gen 1] OU (tradeback)",
-		section: "Past Generations",
-
-		mod: 'gen1',
-		searchShow: false,
-		ruleset: ['Pokemon', 'Sleep Clause Mod', 'Freeze Clause Mod', 'Species Clause', 'OHKO Clause', 'Evasion Moves Clause', 'HP Percentage Mod'],
-		banlist: ['Uber', 'Unreleased', 'Illegal',
-			'Nidoking + Fury Attack + Thrash', 'Exeggutor + Poison Powder + Stomp', 'Exeggutor + Sleep Powder + Stomp',
-			'Exeggutor + Stun Spore + Stomp', 'Jolteon + Focus Energy + Thunder Shock', 'Flareon + Focus Energy + Ember'
-		]
-	},
-	{
-		name: "[Gen 1] Random Battle",
-		section: "Past Generations",
-
-		mod: 'gen1',
-		team: 'random',
-		ruleset: ['Pokemon', 'Sleep Clause Mod', 'Freeze Clause Mod', 'HP Percentage Mod']
 	},
 	{
 		name: "[Gen 1] Challenge Cup",

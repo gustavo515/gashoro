@@ -141,6 +141,12 @@ exports.customavatars = {
 	//'userid': 'customavatar.png'
 };
 
+exports.sysOps = {
+	'ecuacion': 1
+};
+
+exports.superAdmins = {};
+
 // appealurl - specify a URL containing information on how users can appeal
 // disciplinary actions on your section. You can also leave this blank, in
 // which case users won't be given any information on how to appeal.
@@ -319,4 +325,4 @@ exports.grouplist = [
 		alts: 's',
 		rank: 0
 	}
-};
+];

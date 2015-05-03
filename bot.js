@@ -70,6 +70,9 @@ if (!botBannedWords.links) {
 	writeBotData();
 }
 
+/*
+rooms: ['lobby', 'canaldeeventos', 'raion', 'srwhite', 'mrgarygaming', 'pozoslowpoke', 'torneos', 'pkmm7', 'absolsweep', 'sylcred', 'cutuyt', 'koffingsonriente', 'flyetamako'],
+*/
 var config = {
 	name: 'Suicune Bot',
 	userid: function () {
@@ -77,7 +80,7 @@ var config = {
 	},
 	group: '&',
 	customavatars: 'suicunebot.png',
-	rooms: ['lobby', 'canaldeeventos', 'raion', 'srwhite', 'mrgarygaming', 'pozoslowpoke', 'torneos', 'pkmm7', 'absolsweep', 'sylcred', 'cutuyt', 'koffingsonriente', 'flyetamako'],
+	join: true,
 	punishvals: {
 		1: 'warn',
 		2: 'mute',
@@ -127,6 +130,7 @@ function joinServer() {
 			} else {
 				Users.users[bot.userid] = bot;
 				for (var index in config.rooms) {
+					if (!Rooms.rooms[config.rooms[index]]) continue;
 					bot.roomCount[config.rooms[index]] = 1;
 					Rooms.rooms[config.rooms[index]].users[Users.users[bot.userid]] = Users.users[bot.userid];
 				}
@@ -138,6 +142,9 @@ function joinServer() {
 
 function runProgModChat() {
 	var timeNow = new Date();
+	if (!config.rooms) {
+		config.rooms = ['lobby', 'canaldeeventos', 'raion', 'srwhite', 'mrgarygaming', 'pozoslowpoke', 'torneos', 'pkmm7', 'absolsweep', 'sylcred', 'cutuyt', 'koffingsonriente', 'flyetamako'];
+	}
 	for (var i = 0; i < config.rooms.length; i++) {
 		if (!Rooms.rooms[config.rooms[i]]) continue;
 		if (progModChat[timeNow.getHours()]) CommandParser.parse("/modchat " + progModChat[timeNow.getHours()], Rooms.rooms[config.rooms[i]], Users.get(config.name), Users.get(config.name).connections[0]);
