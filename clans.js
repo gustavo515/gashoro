@@ -760,7 +760,7 @@ exports.setWarResult = function (clanA, clanB, scoreA, scoreB, warStyle, warSize
 		++clans[clanAId].wins;
 		++clans[clanBId].losses;
 		result = 1;
-		var scoreRest = (clans[clanBId].rating * 15) / 100;
+		var scoreRest = (clans[clanBId].rating * 15) / 100; 
 		if (scoreRest < 50) scoreRest = 50;
 		clans[clanAId].rating += scoreRest;
 		clans[clanBId].rating -= scoreRest;
@@ -768,7 +768,7 @@ exports.setWarResult = function (clanA, clanB, scoreA, scoreB, warStyle, warSize
 		++clans[clanAId].losses;
 		++clans[clanBId].wins;
 		result = 0;
-		var scoreRest = (clans[clanAId].rating * 15) / 100;
+		var scoreRest = (clans[clanAId].rating * 15) / 100; 
 		if (scoreRest < 50) scoreRest = 50;
 		clans[clanAId].rating -= scoreRest;
 		clans[clanBId].rating += scoreRest;

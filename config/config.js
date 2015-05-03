@@ -184,14 +184,14 @@ exports.appealurl = '';
 //     - potd: Set PotD.
 //     - forcewin: /forcewin command.
 //     - battlemessage: /a command.
-exports.groupsranking = [' ', '$', '+', '¥', '%', '@', '\u2605', '#', '&', '~'];
+exports.groupsranking = [' ', '$', '♥', '+', '¥', '%', '@', '\u2605', '#', '&', '~'];
 exports.groups = {
 	'~': {
 		id: "admin",
 		name: "Administrator",
 		root: true,
 		globalonly: true,
-		rank: 9
+		rank: 10
 	},
 	'&': {
 		id: "leader",
@@ -199,7 +199,8 @@ exports.groups = {
 		inherit: '@',
 		jurisdiction: '@u',
 		promote: 'u',
-		forcewin: true,
+		forcewin: true, 
+		undefinedmute: true,
 		declare: true,
 		modchatall: true,
 		rangeban: true,
@@ -207,20 +208,21 @@ exports.groups = {
 		disableladder: true,
 		globalonly: true, 
 		tournamentsmanagement: true,
-		rank: 8
+		rank: 9
 	},
 	'#': {
 		id: "owner",
 		name: "Room Owner",
 		inherit: '@',
-		jurisdiction: 'u',
+		jurisdiction: 'u', 
+		roomowner: true,
 		roommod: true,
 		roomdriver: true,
 		declare: true,
 		modchatall: true,
 		roomonly: true,
 		tournamentsmanagement: true,
-		rank: 7
+		rank: 8
 	},
 	'\u2605': {
 		id: "player",
@@ -228,9 +230,8 @@ exports.groups = {
 		inherit: '+',
 		roomvoice: true,
 		modchat: true,
-		roomonly: true,
 		privateroom: true,
-		rank: 6
+		rank: 7
 	},
 	'@': {
 		id: "mod",
@@ -238,14 +239,15 @@ exports.groups = {
 		inherit: '%',
 		jurisdiction: 'u',
 		ban: true, 
-		modchat: true,
+		modchat: true, 
+		showimage: true,
 		roomvoice: true, 
 		roomdestacado: true,
 		forcerename: true,
 		ip: true,
 		alts: '@u',
 		tournaments: true,
-		rank: 5
+		rank: 6
 	},
 	'%': {
 		id: "driver",
@@ -259,12 +261,13 @@ exports.groups = {
 		lock: true,
 		forcerename: true,
 		timer: true,
-		modlog: true,
+		modlog: true, 
+		image: true,
 		alts: '%u',
 		bypassblocks: 'u%@&~',
 		receiveauthmessages: true,
 		tournamentsmoderation: true,
-		rank: 4 
+		rank: 5 
 	},
 	'¥': {
 		id: "youtuber",
@@ -273,17 +276,26 @@ exports.groups = {
 		broadcast: true, 
 		announce: true,
 		joinbattle: true,
-		rank: 3
+		rank: 4
 	},
 	'+': {
 		id: "voice",
 		name: "Voice",
 		inherit: ' ',
-		broadcast: true,
+		broadcast: true, 
+		poll: true,
 		joinbattle: true, 
 		tournamentsmanagement: true,
-		rank: 2
+		rank: 3
 	}, 
+	'♥': {
+		id: "rompecorazone",
+		name: "Rompecorazone",
+		inherit: ' ',
+		broadcast: true,
+		joinbattle: true,
+		rank: 2 
+	},	
 	'$': {
 		id: "destacado",
 		name: "Destacado",

@@ -139,7 +139,7 @@ if (cluster.isMaster) {
 		});
 	}
 
-	var app = require('http').createServer();
+	var app = require('http').createServer(); 
 	var avatarsDir = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR : './config/avatars';
 	var appssl;
 	if (Config.ssl) {

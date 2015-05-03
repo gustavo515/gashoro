@@ -9,7 +9,9 @@
  * @license MIT license
  */
 var botBannedWordsDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'botbannedwords.json' : './config/botbannedwords.json';
-var botBannedUsersDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'botbannedusers.json' : './config/botbannedusers.json';
+var botBannedUsersDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'botbannedusers.json' : './config/botbannedusers.json'; 
+var botLockedUsersDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'botlockedusers.json' : './config/botlockedusers.json'; 
+var botRoombanUsersDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'botroombanusers.json' : './config/botroombanusers.json';
 var progModChatDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'progmodchat.json' : './config/progmodchat.json';
 
 var fs = require('fs');
@@ -19,21 +21,29 @@ if (!fs.existsSync(botBannedWordsDataFile))
 	fs.writeFileSync(botBannedWordsDataFile, '{}');
 	
 if (!fs.existsSync(botBannedUsersDataFile))
-	fs.writeFileSync(botBannedUsersDataFile, '{}');
+	fs.writeFileSync(botBannedUsersDataFile, '{}'); 
+	
+if (!fs.existsSync(botLockedUsersDataFile))
+fs.writeFileSync(botLockedUsersDataFile, '{}'); 
+
+if (!fs.existsSync(botRoombanUsersDataFile))
+fs.writeFileSync(botRoombanUsersDataFile, '{}');
 	
 if (!fs.existsSync(progModChatDataFile))
 	fs.writeFileSync(progModChatDataFile, JSON.stringify(defaultProgModChat));
 	
 var botBannedWords = JSON.parse(fs.readFileSync(botBannedWordsDataFile).toString());
-var botBannedUsers = JSON.parse(fs.readFileSync(botBannedUsersDataFile).toString());
+var botBannedUsers = JSON.parse(fs.readFileSync(botBannedUsersDataFile).toString()); 
+var botLockedUsers = JSON.parse(fs.readFileSync(botLockedUsersDataFile).toString()); 
+var botRoombanUsers = JSON.parse(fs.readFileSync(botRoombanUsersDataFile).toString());
 var progModChat = JSON.parse(fs.readFileSync(progModChatDataFile).toString());
 exports.botBannedWords = botBannedWords;
-exports.botBannedUsers = botBannedUsers;
+exports.botBannedUsers = botBannedUsers;  
 
 var battleInProgress = {};
 exports.inBattle = false;
 exports.acceptChallegesDenied = function (user, format) {
-	if (!(format in {'challengecupmetronome':1, 'randombattle':1, 'randomoumonotype':1, 'randominversebattle':1,'randomskybattle':1, 'randomubers':1, 'randomlc':1, 'randomcap':1, 'randomhaxmons':1})) return 'Debido a mi configuración actual, no acepto retos de formato ' + format;
+	if (!(format in {'challengecupmetronome':1, 'randombattle':1, 'randomoumonotype':1, 'randominversebattle':1,'randomskybattle':1, 'randomubers':1, 'seasonalsuperstaffbros': 1, 'randomlc':1, 'randomcap':1, 'randomhaxmons':1})) return 'Debido a mi configuración actual, no acepto retos de formato ' + format;
 	if (battleInProgress[toId(user.name)])  return 'Ya estoy en una batalla contigo, espera a que termine para retarme de nuevo.';
 	if (user.can('joinbattle')) return 'auth';
 	if (exports.inBattle) return 'Estoy ocupado en otra batalla, retame cuando esta termine.';
@@ -67,17 +77,17 @@ var config = {
 	},
 	group: '&',
 	customavatars: 'suicunebot.png',
-	rooms: ['lobby'],
+	rooms: ['lobby', 'canaldeeventos', 'raion', 'srwhite', 'mrgarygaming', 'pozoslowpoke', 'torneos', 'pkmm7', 'absolsweep', 'sylcred', 'cutuyt', 'koffingsonriente', 'flyetamako'],
 	punishvals: {
 		1: 'warn',
 		2: 'mute',
 		3: 'hourmute',
-		5: 'lock'
+		4: 'lock'
 	},
-	privaterooms: ['staff'],
+	privaterooms: ['staff', 'test', 'debate'],
 	hosting: {},
 	laddering: true,
-	ladderPercentage: 70
+	ladderPercentage: 90
 };
 
 /**
@@ -198,7 +208,7 @@ var parse = {
 		if (user.can('staff', room)) return true; //do not mod staff users
 
 		var pointVal = 0;
-		var muteMessage = '';
+		var muteMessage = ''; 
 		
 		//moderation for banned words
 		for (var d = 0; d < botBannedWords.links.length; d++) {
@@ -213,8 +223,8 @@ var parse = {
 		
 		for (var d = 0; d < botBannedWords.chars.length; d++) {
 			if (message.toLowerCase().indexOf(botBannedWords.chars[d]) > -1) {
-				if (pointVal < 2) {
-					pointVal = 2;
+				if (pointVal < 4) {
+					pointVal = 4;
 					muteMessage = ', Su mensaje contiene una frase prohibida';
 					break;
 				}
@@ -465,8 +475,8 @@ var commands = {
 	},
 	
 	guia: function (target, room, user) {
-		if (!this.can('joinbattle')) return this.sendPm('Guía sobre comandos y funcionamiento del Bot: http://pastebin.com/Fj1YfKd1');
-		this.sendReply('Guía sobre comandos y funcionamiento del Bot: http://pastebin.com/Fj1YfKd1');
+		if (!this.can('joinbattle')) return this.sendPm('Guía sobre comandos y funcionamiento del Bot: http://pastebin.com/FGxFgEJV');
+		this.sendReply('Guía sobre comandos y funcionamiento del Bot: http://pastebin.com/FGxFgEJV');
 	},
 	
 	say: function (target, room, user) {
@@ -541,7 +551,121 @@ var commands = {
 		}
 		if (bannedList === '') return this.sendPm('Lista negra vacía.');
 		this.sendPm('Usuarios de la Lista negra: ' + bannedList);
-	},
+	}, 
+	
+	al: function (target, room, user) {
+		if (!this.can('lock')) return;
+		if (!target) return;
+		var parts = target.split(',');
+		var userId;
+		var lockedList = '';
+		for (var n in parts) {
+			userId = toId(parts[n]);
+			if (botLockedUsers[userId]) {
+			 this.sendPm('En usuario "' + userId + '" ya estaba en la lista negra.');
+			 continue;
+			}
+			lockedList += '"' + userId + '", ';
+			botLockedUsers[userId] = 1;
+			CommandParser.parse(('/lock' + ' ' + userId + ', Lock Permanente'), room, Users.get(config.name), Users.get(config.name).connections[0]);
+		}
+		writeBotData();
+		if (parts.length > 1) {
+			this.sendReply('Los usuarios ' + lockedList + ' se han añadido a la lista negra correctamente.');
+		} else {
+			this.sendReply('El usuario "' + toId(target) + '" se ha añadido a la lista negra correctamente.');
+		}
+	}, 
+	
+	unal: function (target, room, user) {
+		if (!this.can('lock')) return;
+		if (!target) return;
+		var parts = target.split(',');
+		var userId;
+		var lockedList = '';
+		for (var n in parts) {
+			userId = toId(parts[n]);
+			if (!botLockedUsers[userId]) {
+			 this.sendPm('En usuario "' + userId + '" no estaba en la lista negra.');
+			 continue;
+			}
+			lockedList += '"' + userId + '", ';
+			delete botLockedUsers[userId];
+		}
+		writeBotData();
+		if (parts.length > 1) {
+			this.sendReply('Los usuarios ' + lockedList + ' han sido eliminados de la lista negra.');
+		} else {
+			this.sendReply('El usuario "' + toId(target) + '" ha sido eliminado de la lista negra.');
+		}
+	}, 
+	
+	val: function (target, room, user) {
+		if (!this.can('lock')) return;
+		var lockedList = '';
+		for (var d in botLockedUsers) {
+			lockedList += d + ', ';
+		}
+		if (bannedList === '') return this.sendPm('Lista negra vacía.');
+		this.sendPm('Usuarios de la Lista negra: ' + lockedList);
+	},  
+	
+	arb: function (target, room, user) {
+		if (!this.can('roomban')) return;
+		if (!target) return;
+		var parts = target.split(',');
+		var userId;
+		var roombanList = '';
+		for (var n in parts) {
+			userId = toId(parts[n]);
+			if (botRoombanUsers[userId]) {
+			 this.sendPm('En usuario "' + userId + '" ya estaba en la lista negra.');
+			 continue;
+			}
+			roombanList += '"' + userId + '", ';
+			botRoombanUsers[userId] = 1;
+			CommandParser.parse(('/roomban' + ' ' + userId + ',Room Ban Permanente'), room, Users.get(config.name), Users.get(config.name).connections[0]);
+		}
+		writeBotData();
+		if (parts.length > 1) {
+			this.sendReply('Los usuarios ' + roombanList + ' se han añadido a la lista negra correctamente.');
+		} else {
+			this.sendReply('El usuario "' + toId(target) + '" se ha añadido a la lista negra correctamente.');
+		}
+	}, 
+	
+	unarb: function (target, room, user) {
+		if (!this.can('roomban')) return;
+		if (!target) return;
+		var parts = target.split(',');
+		var userId;
+		var roombanList = '';
+		for (var n in parts) {
+			userId = toId(parts[n]);
+			if (!botRoombanUsers[userId]) {
+			 this.sendPm('En usuario "' + userId + '" no estaba en la lista negra.');
+			 continue;
+			}
+			roombanList += '"' + userId + '", ';
+			delete botBannedUsers[userId];
+		}
+		writeBotData();
+		if (parts.length > 1) {
+			this.sendReply('Los usuarios ' + roombanList + ' han sido eliminados de la lista negra.');
+		} else {
+			this.sendReply('El usuario "' + toId(target) + '" ha sido eliminado de la lista negra.');
+		}
+	}, 
+	
+	varb: function (target, room, user) {
+		if (!this.can('roomban')) return;
+		var roombanList = '';
+		for (var d in botRoombanUsers) {
+			roombanList += d + ', ';
+		}
+		if (roombanList === '') return this.sendPm('Lista negra vacía.');
+		this.sendPm('Usuarios de la Lista negra: ' + roombanList);
+	}, 
 
 	banword: function (target, room, user) {
 		if (!this.can('rangeban')) return;
@@ -597,7 +721,7 @@ var commands = {
 	
 	vbw: function (target, room, user) {
 		if (!this.can('rangeban')) return;
-		this.sendPm('Frases Prohibidas en Viridian. Caracteres: ' + botBannedWords.chars + " | Contenido +18: " + botBannedWords.links + "| Lenguaje inapropiado: " + botBannedWords.inapropiate);
+		this.sendPm('Frases Prohibidas en Ultimate. Caracteres: ' + botBannedWords.chars + " | Contenido +18: " + botBannedWords.links + "| Lenguaje inapropiado: " + botBannedWords.inapropiate);
 	},
 
 	tell: function (target, room, user) {

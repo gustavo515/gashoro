@@ -837,11 +837,26 @@ var commands = exports.commands = {
 			"- <a href=\"https://github.com/Zarel/Pokemon-Showdown\">Server source code</a><br />" +
 			"- <a href=\"https://github.com/Zarel/Pokemon-Showdown-Client\">Client source code</a>"
 		);
+	}, 
+	
+	ugit: 'openusource',
+	openusource: function (target, room, user) {
+		if (!this.canBroadcast()) return;
+		this.sendReplyBox(
+			"Pokemon Showdown is open source:<br />" +
+			"- Language: JavaScript (Node.js)<br />" +
+			"- <a href=\"https://github.com/Bryan-0/Pokemon-Showdown\">Ultimate Server source code</a><br />"
+		);
 	},
 
 	staff: function (target, room, user) {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox("<a href=\"https://www.smogon.com/sim/staff_list\">Pokemon Showdown Staff List</a>");
+		this.sendReplyBox("Ultimate Staff, hagan /stafflist.");
+	},  
+	
+	plugdj: function (target, room, user) {
+		if (!this.canBroadcast()) return;
+		this.sendReplyBox("<a href=\"https://plug.dj/ultimate-psim\">Plug Dj de Ultimate</a>");
 	},
 
 	avatars: function (target, room, user) {
@@ -1108,9 +1123,9 @@ var commands = exports.commands = {
 	rules: function (target, room, user) {
 		if (!target) {
 			if (!this.canBroadcast()) return;
-			this.sendReplyBox("Please follow the rules:<br />" +
+			this.sendReplyBox("Por favor sigue las reglas:<br />" +
 				(room.rulesLink ? "- <a href=\"" + Tools.escapeHTML(room.rulesLink) + "\">" + Tools.escapeHTML(room.title) + " room rules</a><br />" : "") +
-				"- <a href=\"https://pokemonshowdown.com/rules\">" + (room.rulesLink ? "Global rules" : "Rules") + "</a>");
+				"- <a href=\"http://ultimatepsim.proboards.com/thread/119/reglas-del-server-chats-general\">" + (room.rulesLink ? "Global rules" : "Rules") + "</a>");
 			return;
 		}
 		if (!this.can('roommod', null, room)) return;
@@ -2203,7 +2218,7 @@ var commands = exports.commands = {
 	openroom: function (target, room, user) {
 		var permisionClan = false;
 		var clanRoom = Clans.findClanFromRoom(room.id);
-		if (!clanRoom) return this.sendReply("Esta no es una sala de Clan.");
+		if (!clanRoom) return this.sendReply("Esta no es una sala de Gremio.");
 		var clanUser = Clans.findClanFromMember(user.name);
 		if (clanUser && toId(clanRoom) === toId(clanUser)) {
 			var clanUserid = toId(clanUser);
@@ -2246,10 +2261,10 @@ var commands = exports.commands = {
 		if (!this.canBroadcast()) return false;
 		this.sendReplyBox(
 			"<b><u><center><big><big>Artículos (Tienda actualmente en construccion)</center></u></b><br /><br />" +
-			"<b>Plaza</b> - compra una plaza para el gremio al que se pertenece (1500 -> 3000 -> 6000 -> 10000 pds)<br />" +
-			"<b>Custom Avatar</b> - compra un customavatar para tu user permanente. (6000 pds)<br />"
+            "<b><br>Custom Avatar</b> - compra un customavatar para tu user permanente. (7000 pds)<br />" + 
+            "<b><br>Symbol</b> - compra un custom symbol para que aparezca al lado de tu nick (Se quita en restart) (3500 pds)<br />"			
 			);
-	},
+	}, 
 	
 	buyplace: 'comprarplaza',
 	comprarplaza: function (target, room, user) {
@@ -2288,59 +2303,8 @@ var commands = exports.commands = {
 		if (!params) return this.sendReply("Usage: /buy object");
 		var article = toId(params[0]);
 		switch (article) {
-			case 'customtc':
-				prize = 8000;
-				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
-				var tcUser = Shop.getTrainerCard(user.name);
-				if (!tcUser) {
-					Shop.giveTrainerCard(user.name);
-					tcUser = Shop.getTrainerCard(user.name);
-				}
-				if (tcUser.customTC) return this.sendReply("Ya poseías este artículo.");
-				Shop.setCustomTrainerCard(user.name, true);
-				Shop.removeMoney(user.name, prize);
-				return this.sendReply("Has comprado una Tarjeta de entreador personalizada. Consulta /shophelp para más información.");
-				break;
-			case 'tc':
-				prize = 3000;
-				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
-				var tcUser = Shop.getTrainerCard(user.name);
-				if (tcUser) return this.sendReply("Ya poseías este artículo.");
-				Shop.giveTrainerCard(user.name);
-				Shop.removeMoney(user.name, prize);
-				return this.sendReply("Has comprado una Tarjeta de Entrenador. Revisa /shophelp para saber como editarla.");
-				break;
-			case 'sprite':
-				prize = 100;
-				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
-				var tcUser = Shop.getTrainerCard(user.name);
-				if (!tcUser) return this.sendReply("Necesitas comprar primero una Tarjeta de entrenador.");
-				if (tcUser.nPokemon > 5) return this.sendReply("Ya tienes 6 Pokemon para tu tarjeta de entrenador.");
-				if (tcUser.customTC) return this.sendReply("Tu tarjeta es Personalizada. Usa /tchtml pata modificarla.");
-				Shop.nPokemonTrainerCard(user.name, tcUser.nPokemon + 1);
-				Shop.removeMoney(user.name, prize);
-				return this.sendReply("Has comprado un Sprite de un pokemon para tu TC. Revisa /shophelp para más información.");
-				break;
-			case 'symbol':
-				prize = 4000;
-				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
-				if (Shop.symbolPermision(user.name)) return this.sendReply("Ya posees este artículo.");
-				Shop.setSymbolPermision(user.name, true);
-				Shop.removeMoney(user.name, prize);
-				return this.sendReply("Has comprado el permiso para usar los comandos /customsymbol y /resetsymbol. Para más información consulta /shophelp.");
-				break;
-			case 'avatar':
-				prize = 1000;
-				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
-				if (!Config.customAvatars[user.userid]) return this.sendReply("No tenías un avatar personalizado.");
-				if (params.length !== 2) return this.sendReply("Usa el comando así: /buy avatar,[imagen]");
-				var err = Shop.addPendingAvatar(user.userid, params[1]);
-				if (err) return this.sendReply(err);
-				Shop.removeMoney(user.name, prize);
-				return this.sendReply("Has solicitado un cambio de tu avatar personalizado. Espera a que un admin revise tu compra.");
-				break;
-			case 'customavatar':
-				prize = 6000;
+            case 'customavatar':
+				prize = 7000;
 				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
 				if (Config.customAvatars[user.userid]) return this.sendReply("Ya habías comprado este artículo. Para cambiar tu avatar compra la opcion Avatar");
 				if (params.length !== 2) return this.sendReply("Usa el comando así: /buy avatar,[imagen]");
@@ -2348,18 +2312,15 @@ var commands = exports.commands = {
 				if (err) return this.sendReply(err);
 				Shop.removeMoney(user.name, prize);
 				return this.sendReply("Has solicitado un avatar personalizado. Espera a que un admin revise tu compra.");
-				break;
-			case 'botphrase':
-				prize = 1500;
+				break; 
+            case 'symbol':
+				prize = 3500;
 				if (Shop.getUserMoney(user.name) < prize) return this.sendReply("No tienes suficiente dinero.");
-				if (Shop.getBotPhrase(user.name)) return this.sendReply("Ya posees este articulo.");
-				if (params.length < 2) return this.sendReply("Usa el comando así: /buy botphrase, [texto]");
-				if (toId(params[1]) === 'off') return this.sendReply("Usa el comando así: /buy botphrase, [texto]");
-				if (params[1].length > 150) return this.sendReply("La frase es demasiado larga. Debe ser menor a 150 caracteres.");
-				Shop.changeBotPhrase(user.name, Tools.escapeHTML(target.substr(params[0].length + 1)));
+				if (Shop.symbolPermision(user.name)) return this.sendReply("Ya posees este artículo.");
+				Shop.setSymbolPermision(user.name, true);
 				Shop.removeMoney(user.name, prize);
-				return this.sendReply("Has comprado una frase personalizada para el comando .whois del Bot. Puedes cambiarla tantas veces como quieras con /botphrase.");
-				break;
+				return this.sendReply("Has comprado el permiso para usar los comandos /customsymbol y /resetsymbol. Para más información consulta /shophelp.");
+				break;				
 			default:
 				return this.sendReply("No has especificado ningún artículo válido.");
 		}
@@ -2445,14 +2406,251 @@ var commands = exports.commands = {
 		} else {
 			this.sendReply('Has donado ' + pds + ' pd al usuario ' + userName + '.');
 		}
-	},
+	}, 
 	
+	symbolpermision: function (target, room, user) {
+		if (!this.can('givemoney')) return false;
+		var params = target.split(',');
+		if (!params || params.length !== 2) return this.sendReply("Usage: /symbolpermision usuario, [on/off]");
+		var permision = false;
+		if (toId(params[1]) !== 'on' && toId(params[1]) !== 'off') return this.sendReply("Usage: /symbolpermision usuario, [on/off]");
+		if (toId(params[1]) === 'on') permision = true;
+		if (permision) {
+			var userh = Users.getExact(params[0]);
+			if (!userh || !userh.connected) return this.sendReply("El usuario no existe o no está disponible");
+			if (Shop.setSymbolPermision(params[0], permision)) return this.sendReply("Permiso para customsymbols concedido a " + userh.name);
+			return this.sendReply("El usuario ya poseía permiso para usar los customsymbols.");
+		} else {
+			if (Shop.setSymbolPermision(params[0], permision)) return this.sendReply("Permiso para customsymbols retirado a " + params[0]);
+			return this.sendReply("El usuario no tenía ningún permiso que quitar.");
+		}
+	},
+
+	simbolo: 'customsymbol',
+	customsymbol: function (target, room, user) {
+		if (!Shop.symbolPermision(user.name)) return  this.sendReply('Debes comprar este comando en la tienda para usarlo.');
+		if (!target || target.length > 1) return this.parse('Debes especificar un caracter como simbolo.');
+		if (target.match(/[A-Za-z\d]+/g) || '‽!$+\u2605%@\u2605&~#'.indexOf(target) >= 0) return this.sendReply('Lo sentimos, pero no puedes cambiar el símbolo al que has escogido por razones de seguridad/estabilidad.');
+		user.getIdentity = function (roomid) {
+			var name = this.name;
+			if (this.locked) {
+				return '‽' + name;
+			}
+			if (this.mutedRooms[roomid]) {
+				return '!' + name;
+			}
+			if (roomid && roomid === 'lobby' && target !== " ") return this.group + name;
+			return target + name;
+		};
+		user.updateIdentity();
+		user.hasCustomSymbol = true;
+	},
+
+	resetsymbol: function (target, room, user) {
+		if (!user.hasCustomSymbol) return this.sendReply('No tienes nigún simbolo personalizado.');
+		user.getIdentity = function (roomid) {
+			if (!roomid) roomid = 'lobby';
+			var name = this.name;
+			if (this.locked) {
+				return '‽' + name;
+			}
+			if (this.mutedRooms[roomid]) {
+				return '!' + name;
+			}
+			var room = Rooms.rooms[roomid];
+			if (room.auth) {
+				if (room.auth[this.userid]) {
+					return room.auth[this.userid] + name;
+				}
+			if (room.isPrivate) return ' ' + name;
+			}
+			return this.group + name;
+		};
+		user.hasCustomSymbol = false;
+		user.updateIdentity();
+		this.sendReply('Tu simbolo se ha restablecido.'); 
+		
+	}, 
+	
+		jugando: 'afk',
+    ocupado: 'afk',  
+	comiendo: 'afk', 
+    durmiendo: 'afk', 
+    grabando: 'afk',	
+    aburrido: 'afk', 
+	programando: 'afk',
+	ausente: 'afk',
+	away: 'afk',
+	afk: function(target, room, user, connection, cmd) {
+		if (!this.canTalk) return false;
+		var t = 'Away';
+		switch (cmd) {
+			case 'jugando':
+			t = 'ⒿⓊⒼⒶⓃⒹⓄ';
+			s = 'Jugando'
+			break;   
+			case 'aburrido':
+			t = 'ⒶⒷⓊⓇⓇⒾⒹⓄ';
+			s = 'Aburrido'
+			break;  
+            case 'comiendo':
+			t = 'ⒸⓄⓂⒾⒺⓃⒹⓄ';
+			s = 'Comiendo'
+			break;  
+            case 'grabando':
+			t = 'ⒼⓇⒶⒷⒶⓃⒹⓄ';
+			s = 'Grabando'
+			break;			
+			case 'durmiendo':
+			t = 'ⒹⓊⓇⓂⒾⒺⓃⒹⓄ';
+			s = 'Durmiendo'
+			break; 
+			case 'programando':
+			t = 'ⓅⓇⓄⒼⓇⒶⓂⒶⓃⒹⓄ';
+			s = 'Programando'
+			break;
+			case 'ocupado':
+			t = 'ⓄⒸⓊⓅⒶⒹⓄ';
+			s = 'Ocupado'
+			break;
+			default:
+			t = 'ⒶⓊⓈⒺⓃⓉⒺ'
+			s = 'Ausente'
+			break;
+		}
+
+		if (!user.isAway) {
+			user.originalName = user.name;
+			var awayName = user.name + ' - '+t;
+			//delete the user object with the new name in case it exists - if it does it can cause issues with forceRename
+			delete Users.get(awayName);
+			user.forceRename(awayName, undefined, true);
+
+			if (user.isStaff) this.add('|raw|<b> <font color="#2EFEF7">' + Tools.escapeHTML(user.originalName) +'</font color></b> esta '+s.toLowerCase()+'. '+ (target ? " (" + escapeHTML(target) + ")" : ""));
+
+			user.isAway = true;
+			user.blockChallenges = true;
+		}
+		else {
+			return this.sendReply('Tu estas como ausente, digita /back.');
+		}
+
+		user.updateIdentity();
+	},
+
+	back: 'unafk',
+	regresar: 'unafk',
+	unafk: function(target, room, user, connection) {
+		if (!this.canTalk) return false;
+
+		if (user.isAway) {
+			if (user.name === user.originalName) {
+				user.isAway = false;
+				return this.sendReply('Tu nombre no ha cambiado y ya no estas ausente.');
+			}
+
+			var newName = user.originalName;
+
+			//delete the user object with the new name in case it exists - if it does it can cause issues with forceRename
+			delete Users.get(newName);
+
+			user.forceRename(newName, undefined, true);
+
+			//user will be authenticated
+			user.authenticated = true;
+
+			if (user.isStaff) this.add('|raw|<b> <font color="#2EFEF7">' + Tools.escapeHTML(newName) + '</font color></b> regreso.');
+
+			user.originalName = '';
+			user.isAway = false;
+			user.blockChallenges = false;
+		}
+		else {
+			return this.sendReply('Tu no estas ausente.');
+		}
+
+		user.updateIdentity();
+	}, 
+	
+	img: 'image',
+        image: function(target, room, user) {
+                if (!user.can('wall', null, room)) return false;
+                if (!target) return this.sendReply('/image [url], [tamaño]');
+                var targets = target.split(',');
+                var url = targets[0];
+                var width = targets[1];
+                if (!url || !width) return this.sendReply('/image [url], [width percentile]');
+                if (url.indexOf('.png') === -1 && url.indexOf('.jpg') === -1 && url.indexOf('.gif') === -1) {
+                        return this.sendReply('La url debe terminar en .png, .jpg o .gif');
+                }
+                if (isNaN(width)) return this.sendReply('El tamaño debe ser un numero.');
+                if (width < 1 || width > 100) return this.sendReply('El tamaño debe ser mayor que 0 y menor que 100.');
+                this.add('|raw|<center><img width="'+width+'%" src="'+url+'"></center>');
+        }, 
+		
+	masspm: 'pmall',
+    pmall: function (target, room, user) {
+        if (!this.can('pmall')) return;
+        if (!target) return this.parse('/help pmall');
+
+        var pmName = '~Ultimate PM[No Respondas]';
+
+        for (var i in Users.users) {
+            var message = '|pm|' + pmName + '|' + Users.users[i].getIdentity() + '|' + target;
+            Users.users[i].send(message);
+        }
+    },  
+	
+	show: function (target, room, user) {
+        if (!this.can('lock')) return;
+        delete user.getIdentity
+        user.hiding = false;
+        user.updateIdentity();
+        this.sendReply('Has revelado tu símbolo de staff.');
+        return false;
+    },
+
+    hide: function (target, room, user) {
+        // add support for away
+        if (!this.can('lock')) return;
+        user.getIdentity = function () {
+            var name = this.name + (this.away ? " - Ⓐⓦⓐⓨ" : "");
+            if (this.locked) return '‽' + name;
+            if (this.muted) return '!' + name;
+            return ' ' + name;
+        };
+        user.hiding = true;
+        user.updateIdentity();
+        this.sendReply('Has escondido tu símbolo de staff.');
+    }, 
+	
+    clearall: function (target, room, user) {
+        if (!this.can('makeroom')) return this.sendReply('/clearall - Access denied.');
+        var len = room.log.length,
+            users = [];
+        while (len--) {
+            room.log[len] = '';
+        }
+        for (var user in room.users) {
+            users.push(user);
+            Users.get(user).leaveRoom(room, Users.get(user).connections[0]);
+        }
+        len = users.length;
+        setTimeout(function() {
+            while (len--) {
+                Users.get(users[len]).joinRoom(room, Users.get(users[len]).connections[0]);
+            }
+        }, 1000);
+    }, 
+		
 	/*********************************************************
 	 * Help commands
 	 *********************************************************/
 
 	commands: 'help',
-	h: 'help',
+	h: 'help', 
+	ayuda: 'help', 
+	serverhelp: 'help',
 	'?': 'help',
 	help: function (target, room, user) {
 		target = target.toLowerCase();
@@ -2715,6 +2913,10 @@ var commands = exports.commands = {
 		if (target === 'declare') {
 			matched = true;
 			this.sendReply("/declare [message] - Anonymously announces a message. Requires: & ~");
+		} 
+		if (target === 'potd') {
+			matched = true;
+			this.sendReply("/potd [pokemon] - Set the pokemon of the day. Requires: & ~");
 		}
 
 		// admin commands

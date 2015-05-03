@@ -408,9 +408,9 @@ fs.readFile('./config/ipbans.txt', function (err, data) {
 	Users.checkRangeBanned = Cidr.checker(rangebans);
 });
 
-global.Shop = require('./shop.js');
-global.Clans = require('./clans.js');
-global.War = require('./war.js');
+global.Shop = require('./shop.js');  
+global.Bot = require('./bot.js'); 
+global.Clans = require('./clans.js'); 
+global.War = require('./war.js'); 
 global.tour = new (require('./tour.js').tour)();
 global.teamTour = require('./teamtour.js');
-global.Bot = require('./bot.js');

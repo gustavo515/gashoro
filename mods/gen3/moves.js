@@ -261,14 +261,6 @@ exports.BattleMovedex = {
 	},
 	explosion: {
 		inherit: true,
-		onAfterMove: function (pokemon) {
-			for (var i = 0; i < pokemon.side.active.length; i++) {
-				this.cancelMove(pokemon.side.active[i]);
-			}
-			for (var i = 0; i < pokemon.side.foe.active.length; i++) {
-				this.cancelMove(pokemon.side.foe.active[i]);
-			}
-		},
 		basePower: 500
 	},
 	extrasensory: {
@@ -504,15 +496,6 @@ exports.BattleMovedex = {
 		inherit: true,
 		isContact: true
 	},
-	payback: {
-		inherit: true,
-		basePowerCallback: function (pokemon, target) {
-			if (this.willMove(target)) {
-				return 50;
-			}
-			return 100;
-		}
-	},
 	petaldance: {
 		inherit: true,
 		basePower: 70,
@@ -554,14 +537,6 @@ exports.BattleMovedex = {
 	},
 	selfdestruct: {
 		inherit: true,
-		onAfterMove: function (pokemon) {
-			for (var i = 0; i < pokemon.side.active.length; i++) {
-				this.cancelMove(pokemon.side.active[i]);
-			}
-			for (var i = 0; i < pokemon.side.foe.active.length; i++) {
-				this.cancelMove(pokemon.side.foe.active[i]);
-			}
-		},
 		basePower: 400
 	},
 	skillswap: {
@@ -703,7 +678,7 @@ exports.BattleMovedex = {
 		inherit: true,
 		effect: {
 			duration: 2,
-			onResidualOrder: 2,
+			onResidualOrder: 0,
 			onEnd: function (side) {
 				var target = side.active[this.effectData.sourcePosition];
 				if (!target.fainted) {

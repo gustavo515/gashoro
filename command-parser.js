@@ -15,11 +15,8 @@
  */
 
 /*
-
 To reload chat commands:
-
 /hotpatch chat
-
 */
 
 const MAX_MESSAGE_LENGTH = 300;
@@ -61,21 +58,21 @@ var modlog = exports.modlog = {lobby: fs.createWriteStream('logs/modlog/modlog_l
  */
 function canTalk(user, room, connection, message) {
 	if (!user.named) {
-		connection.popup("You must choose a name before you can talk.");
+		connection.popup("Tienes que elegir un nombre de usuario antes de hablar.");
 		return false;
 	}
 	if (room && user.locked) {
-		connection.sendTo(room, "You are locked from talking in chat.");
+		connection.sendTo(room, "Estas bloqueado no puedes hablar en el chat.");
 		return false;
 	}
 	if (room && user.mutedRooms[room.id]) {
-		connection.sendTo(room, "You are muted and cannot talk in this room.");
+		connection.sendTo(room, "Estas silenciado no puedes hablar en el chat.");
 		return false;
 	}
 	if (room && room.modchat) {
 		if (room.modchat === 'crash') {
 			if (!user.can('ignorelimits')) {
-				connection.sendTo(room, "Because the server has crashed, you cannot speak in lobby chat.");
+				connection.sendTo(room, "Por que el servidor esta roto, no puedes hablar ahorita.");
 				return false;
 			}
 		} else {
