@@ -1,7 +1,43 @@
 exports.BattleMovedex = {
+	"acid": {
+		inherit: true,
+		secondary: {
+			chance: 33,
+			boosts: {
+				def: -1
+			}
+		}
+	},
+	aurorabeam: {
+		inherit: true,
+		secondary: {
+			chance: 33,
+			boosts: {
+				atk: -1
+			}
+		}
+	},
 	bind: {
 		inherit: true,
 		onBeforeMove: function () {}
+	},
+	bubble: {
+		inherit: true,
+		secondary: {
+			chance: 33,
+			boosts: {
+				spe: -1
+			}
+		}
+	},
+	bubblebeam: {
+		inherit: true,
+		secondary: {
+			chance: 33,
+			boosts: {
+				spe: -1
+			}
+		}
 	},
 	clamp: {
 		inherit: true,
@@ -116,8 +152,8 @@ exports.BattleMovedex = {
 				this.effectData.hp = Math.floor(target.maxhp / 4);
 				delete target.volatiles['partiallytrapped'];
 			},
-			onTryPrimaryHitPriority: -1,
-			onTryPrimaryHit: function (target, source, move) {
+			onTryHitPriority: -1,
+			onTryHit: function (target, source, move) {
 				if (target === source) {
 					this.debug('sub bypass: self hit');
 					return;

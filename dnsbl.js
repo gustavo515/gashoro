@@ -53,3 +53,29 @@ exports.query = function queryDnsbl(ip, callback) {
 	var reversedIpDot = ip.split('.').reverse().join('.') + '.';
 	queryDnsblLoop(ip, callback, reversedIpDot, 0);
 };
+
+exports.reverse = function reverseDns(ip, callback) {
+	if (ip) {
+		if (ip.startsWith('106.76.') || ip.startsWith('106.77.') || ip.startsWith('106.78.') || ip.startsWith('106.79.') || ip.startsWith('112.110.') || ip.startsWith('27.97.') || ip.startsWith('49.15.') || ip.startsWith('49.14.') || ip.startsWith('1.187.')) {
+			callback(null, ['ideacellular.nohost']);
+			return;
+		}
+		if (ip.startsWith('172.56.') || ip.startsWith('149.254.')) {
+			callback(null, ['tmobile.nohost']);
+			return;
+		}
+		if (ip.startsWith('167.114.')) {
+			callback(null, ['ovh.nohost']);
+			return;
+		}
+		if (ip.startsWith('178.62.')) {
+			callback(null, ['digitalocean.nohost']);
+			return;
+		}
+		if (ip.startsWith('216.172.142.')) {
+			callback(null, ['egihosting.nohost']);
+			return;
+		}
+	}
+	return require('dns').reverse(ip, callback);
+};

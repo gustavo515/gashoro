@@ -22,7 +22,7 @@ if (cluster.isMaster) {
 	var workers = exports.workers = {};
 
 	var spawnWorker = exports.spawnWorker = function () {
-		var worker = cluster.fork({PSPORT: Config.port, PSBINDADDR: Config.bindaddress || ''});
+		var worker = cluster.fork({PSPORT: Config.port, PSBINDADDR: Config.bindaddress || '', PSNOSSL: Config.ssl ? 0 : 1});
 		var id = worker.id;
 		workers[id] = worker;
 		worker.on('message', function (data) {
@@ -116,6 +116,7 @@ if (cluster.isMaster) {
 
 	if (process.env.PSPORT) Config.port = +process.env.PSPORT;
 	if (process.env.PSBINDADDR) Config.bindaddress = process.env.PSBINDADDR;
+	if (+process.env.PSNOSSL) Config.ssl = null;
 
 	// ofe is optional
 	// if installed, it will heap dump if the process runs out of memory
@@ -228,10 +229,7 @@ if (cluster.isMaster) {
 			}
 		}
 	};
-	var interval;
-	if (!Config.herokuhack) {
-		interval = setInterval(sweepClosedSockets, 1000 * 60 * 10);
-	}
+	var interval = setInterval(sweepClosedSockets, 1000 * 60 * 10);
 
 	process.on('message', function (data) {
 		// console.log('worker received: ' + data);
@@ -355,6 +353,10 @@ if (cluster.isMaster) {
 		}
 	});
 
+	process.on('disconnect', function () {
+		process.exit();
+	});
+
 	// this is global so it can be hotpatched if necessary
 	var isTrustedProxyIp = Cidr.checker(Config.proxyip);
 	var socketCounter = 0;
@@ -388,17 +390,6 @@ if (cluster.isMaster) {
 
 		process.send('*' + socketid + '\n' + socket.remoteAddress);
 
-		// console.log('CONNECT: ' + socket.remoteAddress + ' [' + socket.id + ']');
-		var interval;
-		if (Config.herokuhack) {
-			// see https://github.com/sockjs/sockjs-node/issues/57#issuecomment-5242187
-			interval = setInterval(function () {
-				try {
-					socket._session.recv.didClose();
-				} catch (e) {}
-			}, 15000);
-		}
-
 		socket.on('data', function (message) {
 			// drop empty messages (DDoS?)
 			if (!message) return;
@@ -411,11 +402,7 @@ if (cluster.isMaster) {
 		});
 
 		socket.on('close', function () {
-			if (interval) {
-				clearInterval(interval);
-			}
 			process.send('!' + socketid);
-
 			delete sockets[socketid];
 			for (var channelid in channels) {
 				delete channels[channelid][socketid];
@@ -423,14 +410,17 @@ if (cluster.isMaster) {
 		});
 	});
 	server.installHandlers(app, {});
-	app.listen(Config.port, Config.bindaddress || undefined);
-	console.log('Worker ' + cluster.worker.id + ' now listening on ' + (Config.bindaddress || '*') + ':' + Config.port);
+	if (!Config.bindaddress) Config.bindaddress = '0.0.0.0';
+	app.listen(Config.port, Config.bindaddress);
+	console.log('Worker ' + cluster.worker.id + ' now listening on ' + Config.bindaddress + ':' + Config.port);
 
 	if (appssl) {
 		server.installHandlers(appssl, {});
-		appssl.listen(Config.ssl.port);
+		appssl.listen(Config.ssl.port, Config.bindaddress);
 		console.log('Worker ' + cluster.worker.id + ' now listening for SSL on port ' + Config.ssl.port);
 	}
 
-	console.log('Test your server at http://' + (Config.bindaddress || 'localhost') + ':' + Config.port);
+	console.log('Test your server at http://' + (Config.bindaddress === '0.0.0.0' ? 'localhost' : Config.bindaddress) + ':' + Config.port);
+
+	require('./repl.js').start('sockets-', cluster.worker.id + '-' + process.pid, function (cmd) { return eval(cmd); });
 }

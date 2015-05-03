@@ -1,9 +1,8 @@
 exports.BattleStatuses = {
 	par: {
 		inherit: true,
-		onBeforeMovePriority: 2,
 		onBeforeMove: function (pokemon) {
-			if (pokemon.ability !== 'magicguard' && this.random(4) === 0) {
+			if (!pokemon.hasAbility('magicguard') && this.random(4) === 0) {
 				this.add('cant', pokemon, 'par');
 				return false;
 			}
@@ -16,9 +15,9 @@ exports.BattleStatuses = {
 			// 1-4 turns
 			this.effectData.time = this.random(2, 6);
 		},
-		onBeforeMovePriority: 2,
+		onBeforeMovePriority: 10,
 		onBeforeMove: function (pokemon, target, move) {
-			if (pokemon.getAbility().isHalfSleep) {
+			if (pokemon.hasAbility('earlybird')) {
 				pokemon.statusData.time--;
 			}
 			pokemon.statusData.time--;
@@ -30,6 +29,18 @@ exports.BattleStatuses = {
 			if (move.sleepUsable) {
 				return;
 			}
+			return false;
+		}
+	},
+	frz: {
+		inherit: true,
+		onBeforeMove: function (pokemon, target, move) {
+			if (this.random(5) === 0) {
+				pokemon.cureStatus();
+				return;
+			}
+			if (move.flags['defrost']) return;
+			this.add('cant', pokemon, 'frz');
 			return false;
 		}
 	},

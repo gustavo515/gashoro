@@ -7,9 +7,9 @@
  *
  * Individual commands are put in:
  *   commands.js - "core" commands that shouldn't be modified
- *   config/commands.js - other commands that can be safely modified
+ *   chat-plugins/ - other commands that can be safely modified
  *
- * The command API is (mostly) documented in config/commands.js
+ * The command API is (mostly) documented in chat-plugins/COMMANDS.md
  *
  * @license MIT license
  */
@@ -34,11 +34,6 @@ var fs = require('fs');
  *********************************************************/
 
 var commands = exports.commands = require('./commands.js').commands;
-
-var customCommands = require('./config/commands.js');
-if (customCommands && customCommands.commands) {
-	Object.merge(commands, customCommands.commands);
-}
 
 // Install plug-in commands
 
@@ -80,7 +75,7 @@ function canTalk(user, room, connection, message) {
 			if (room.auth) {
 				if (room.auth[user.userid]) {
 					userGroup = room.auth[user.userid];
-				} else if (room.isPrivate) {
+				} else if (room.isPrivate === true) {
 					userGroup = ' ';
 				}
 			}
@@ -201,16 +196,48 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 		cmd = cmd.substr(1);
 	}
 
-	var commandHandler = commands[cmd];
-	if (typeof commandHandler === 'string') {
-		// in case someone messed up, don't loop
-		commandHandler = commands[commandHandler];
+	var namespaces = [];
+	var currentCommands = commands;
+	var originalMessage = message;
+	var commandHandler;
+	do {
+		commandHandler = currentCommands[cmd];
+		if (typeof commandHandler === 'string') {
+			// in case someone messed up, don't loop
+			commandHandler = currentCommands[commandHandler];
+		}
+		if (commandHandler && typeof commandHandler === 'object') {
+			namespaces.push(cmd);
+
+			var newCmd = target;
+			var newTarget = '';
+			var spaceIndex = target.indexOf(' ');
+			if (spaceIndex > 0) {
+				newCmd = target.substr(0, spaceIndex);
+				newTarget = target.substr(spaceIndex + 1);
+			}
+			newCmd = newCmd.toLowerCase();
+			var newMessage = message.replace(cmd + (target ? ' ' : ''), '');
+
+			cmd = newCmd;
+			target = newTarget;
+			message = newMessage;
+			currentCommands = commandHandler;
+		}
+	} while (commandHandler && typeof commandHandler === 'object');
+	if (!commandHandler && currentCommands.default) {
+		commandHandler = currentCommands.default;
+		if (typeof commandHandler === 'string') {
+			commandHandler = currentCommands[commandHandler];
+		}
 	}
+	var fullCmd = namespaces.concat(cmd).join(' ');
+
 	if (commandHandler) {
 		var context = {
 			sendReply: function (data) {
 				if (this.broadcasting) {
-					room.add(data, true);
+					room.add(data);
 				} else {
 					connection.sendTo(room, data);
 				}
@@ -222,7 +249,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 				connection.popup(message);
 			},
 			add: function (data) {
-				room.add(data, true);
+				room.add(data);
 			},
 			send: function (data) {
 				room.send(data);
@@ -260,14 +287,14 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 			},
 			can: function (permission, target, room) {
 				if (!user.can(permission, target, room)) {
-					this.sendReply("/" + cmd + " - Access denied.");
+					this.sendReply("/" + fullCmd + " - Access denied.");
 					return false;
 				}
 				return true;
 			},
 			canBroadcast: function (suppressMessage) {
 				if (broadcast) {
-					message = this.canTalk(message);
+					var message = this.canTalk(originalMessage);
 					if (!message) return false;
 					if (!user.can('broadcast', null, room)) {
 						connection.sendTo(room, "You need to be voiced to broadcast this command's information.");
@@ -276,7 +303,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 					}
 
 					// broadcast cooldown
-					var normalized = toId(message);
+					var normalized = message.toLowerCase().replace(/[^a-z0-9\s!,]/g, '');
 					if (room.lastBroadcast === normalized &&
 							room.lastBroadcastTime >= Date.now() - BROADCAST_COOLDOWN) {
 						connection.sendTo(room, "You can't broadcast this because it was just broadcast.");
@@ -290,7 +317,10 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 				}
 				return true;
 			},
-			parse: function (message) {
+			parse: function (message, inNamespace) {
+				if (inNamespace && (message[0] === '/' || message[0] === '!')) {
+					message = message[0] + namespaces.concat(message.slice(1)).join(" ");
+				}
 				return parse(message, room, user, connection, levelsDeep + 1);
 			},
 			canTalk: function (message, relevantRoom) {
@@ -307,6 +337,36 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 						return false;
 					}
 				}
+				if (/>here.?</i.test(html) || /click here/i.test(html)) {
+					this.sendReply('Do not use "click here"');
+					return false;
+				}
+
+				// check for mismatched tags
+				var tags = html.toLowerCase().match(/<\/?(div|a|button|b|i|u|center|font)\b/g);
+				if (tags) {
+					var stack = [];
+					for (var i = 0; i < tags.length; i++) {
+						var tag = tags[i];
+						if (tag.charAt(1) === '/') {
+							if (!stack.length) {
+								this.sendReply("Extraneous </" + tag.substr(2) + "> without an opening tag.");
+								return false;
+							}
+							if (tag.substr(2) !== stack.pop()) {
+								this.sendReply("Missing </" + tag.substr(2) + "> or it's in the wrong place.");
+								return false;
+							}
+						} else {
+							stack.push(tag.substr(1));
+						}
+					}
+					if (stack.length) {
+						this.sendReply("Missing </" + stack.pop() + ">.");
+						return false;
+					}
+				}
+
 				return true;
 			},
 			targetUserOrSelf: function (target, exactName) {
@@ -347,7 +407,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 					'Additional information:\n' +
 					'user = ' + user.name + '\n' +
 					'room = ' + room.id + '\n' +
-					'message = ' + message;
+					'message = ' + originalMessage;
 			var fakeErr = {stack: stack};
 
 			if (!require('./crashlogger.js')(fakeErr, 'A chat command')) {
@@ -375,9 +435,9 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 			}
 		}
 
-		if (message.substr(0, 1) === '/' && cmd) {
+		if (message.charAt(0) === '/' && fullCmd) {
 			// To guard against command typos, we now emit an error message
-			return connection.sendTo(room.id, "The command '/" + cmd + "' was unrecognized. To send a message starting with '/" + cmd + "', type '//" + cmd + "'.");
+			return connection.sendTo(room.id, "The command '/" + fullCmd + "' was unrecognized. To send a message starting with '/" + fullCmd + "', type '//" + fullCmd + "'.");
 		}
 	}
 

@@ -1,12 +1,4 @@
 exports.BattleStatuses = {
-	brn: {
-		inherit: true,
-		onBasePower: function (basePower, attacker, defender, move) {
-			if (move && move.category === 'Physical' && attacker && attacker.ability !== 'guts') {
-				return this.chainModify(0.5); // This should really take place directly in the damage function but it's here for now
-			}
-		}
-	},
 	slp: {
 		inherit: true,
 		onSwitchIn: function (target) {
@@ -54,6 +46,7 @@ exports.BattleStatuses = {
 	},
 	gem: {
 		duration: 1,
+		affectsFainted: true,
 		onBasePower: function (basePower, user, target, move) {
 			this.debug('Gem Boost');
 			return this.chainModify(1.5);

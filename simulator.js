@@ -200,9 +200,10 @@ var Battle = (function () {
 		ResourceMonitor.activeIp = null;
 	};
 
-	Battle.prototype.resendRequest = function (user) {
-		if (this.requests[user.userid]) {
-			user.sendTo(this.id, '|request|' + this.requests[user.userid]);
+	Battle.prototype.resendRequest = function (connection) {
+		var request = this.requests[connection.user];
+		if (request) {
+			connection.sendTo(this.id, '|request|' + request);
 		}
 	};
 	Battle.prototype.win = function (user) {
@@ -266,7 +267,7 @@ var Battle = (function () {
 	};
 	Battle.prototype.getPlayer = function (slot) {
 		if (typeof slot === 'string') {
-			if (slot.substr(0, 1) === 'p') {
+			if (slot.charAt(0) === 'p') {
 				slot = parseInt(slot.substr(1), 10) - 1;
 			} else {
 				slot = parseInt(slot, 10);

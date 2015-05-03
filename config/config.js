@@ -184,16 +184,17 @@ exports.appealurl = '';
 //     - potd: Set PotD.
 //     - forcewin: /forcewin command.
 //     - battlemessage: /a command.
-exports.groupsranking = [' ', '$', '♥', '+', '¥', '%', '@', '\u2605', '#', '&', '~'];
-exports.groups = {
-	'~': {
+exports.grouplist = [
+	{
+		symbol: '~',
 		id: "admin",
 		name: "Administrator",
 		root: true,
 		globalonly: true,
 		rank: 10
 	},
-	'&': {
+	{
+		symbol: '&',
 		id: "leader",
 		name: "Leader",
 		inherit: '@',
@@ -210,7 +211,8 @@ exports.groups = {
 		tournamentsmanagement: true,
 		rank: 9
 	},
-	'#': {
+	{
+		symbol: '#',
 		id: "owner",
 		name: "Room Owner",
 		inherit: '@',
@@ -224,7 +226,8 @@ exports.groups = {
 		tournamentsmanagement: true,
 		rank: 8
 	},
-	'\u2605': {
+	{
+		symbol: '\u2605',
 		id: "player",
 		name: "Player",
 		inherit: '+',
@@ -233,7 +236,8 @@ exports.groups = {
 		privateroom: true,
 		rank: 7
 	},
-	'@': {
+	{
+		symbol: '@',
 		id: "mod",
 		name: "Moderator",
 		inherit: '%',
@@ -249,7 +253,8 @@ exports.groups = {
 		tournaments: true,
 		rank: 6
 	},
-	'%': {
+	{
+		symbol: '%',
 		id: "driver",
 		name: "Driver",
 		inherit: '¥',
@@ -269,7 +274,8 @@ exports.groups = {
 		tournamentsmoderation: true,
 		rank: 5 
 	},
-	'¥': {
+	{
+		symbol: '¥',
 		id: "youtuber",
 		name: "Youtuber",
 		inherit: '+',
@@ -278,7 +284,8 @@ exports.groups = {
 		joinbattle: true,
 		rank: 4
 	},
-	'+': {
+	{
+		symbol: '+',
 		id: "voice",
 		name: "Voice",
 		inherit: ' ',
@@ -288,7 +295,8 @@ exports.groups = {
 		tournamentsmanagement: true,
 		rank: 3
 	}, 
-	'♥': {
+	{
+		symbol: '♥',
 		id: "rompecorazone",
 		name: "Rompecorazone",
 		inherit: ' ',
@@ -296,7 +304,8 @@ exports.groups = {
 		joinbattle: true,
 		rank: 2 
 	},	
-	'$': {
+	{
+		symbol: '$',
 		id: "destacado",
 		name: "Destacado",
 		inherit: ' ',
@@ -304,7 +313,8 @@ exports.groups = {
 		joinbattle: true,
 		rank: 1 
 	},
-	' ': {
+	{
+		symbol: ' ',
 		ip: 's',
 		alts: 's',
 		rank: 0

@@ -56,4 +56,10 @@ if (!process.send) {
 			guid: message.guid
 		});
 	});
+
+	process.on('disconnect', function () {
+		process.exit();
+	});
+
+	require('./repl.js').start('verifier', function (cmd) { return eval(cmd); });
 }
