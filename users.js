@@ -379,7 +379,7 @@ function importUsergroups() {
 	// can't just say usergroups = {} because it's exported
 	for (var i in usergroups) delete usergroups[i];
 
-	fs.readFile('config/usergroups.csv', function (err, data) {
+	/*fs.readFile('config/usergroups.csv', function (err, data) {
 		if (err) return;
 		data = ('' + data).split("\n");
 		for (var i = 0; i < data.length; i++) {
@@ -387,7 +387,7 @@ function importUsergroups() {
 			var row = data[i].split(",");
 			usergroups[toId(row[0])] = (row[1] || Config.groupsranking[0]) + row[0];
 		}
-	});
+	});*/
 	if (process.env.OPENSHIFT_DATA_DIR) {
 		fs.readFile(process.env.OPENSHIFT_DATA_DIR + 'usergroups.csv', function (err, data) {
 			if (err) return;

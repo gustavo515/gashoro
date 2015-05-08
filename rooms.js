@@ -1492,7 +1492,8 @@ var ChatRoom = (function () {
 				'</div></div>';
 		}
 
-		if (this.introMessage) return '\n|raw|<div class="infobox infobox-limited">' + this.introMessage + '</div>';
+		if (this.introMessage && !this.isOfficial) return '\n|raw|<div class="infobox infobox-limited">' + this.introMessage + '</div>';
+		else if (this.introMessage) return '\n|raw|<div class="infobox">' + this.introMessage + '</div>';
 
 		return '';
 	};
