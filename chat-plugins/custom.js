@@ -1206,7 +1206,6 @@ exports.commands = {
 	comiendo: 'afk', 
         durmiendo: 'afk', 
         grabando: 'afk',	
-        aburrido: 'afk', 
 	programando: 'afk',
 	ausente: 'afk',
 	away: 'afk',
@@ -1217,10 +1216,6 @@ exports.commands = {
 			case 'jugando':
 			t = 'ⒿⓊⒼⒶⓃⒹⓄ';  
 			s = 'Jugando'
-			break;   
-			case 'aburrido':
-			t = 'ⒶⒷⓊⓇⓇⒾⒹⓄ';
-			s = 'Aburrido'
 			break;  
                         case 'comiendo':
 			t = 'ⒸⓄⓂⒾⒺⓃⒹⓄ';
