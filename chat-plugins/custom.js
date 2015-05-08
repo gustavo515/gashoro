@@ -1,4 +1,4 @@
-﻿exports.commands = {
+exports.commands = {
 	foro: function () {
 		if (!this.canBroadcast()) return;
 		this.sendReplyBox("<a href=\"http://ultimatepsim.proboards.com\">Foro de Ultimate Server!</a>");
@@ -1201,12 +1201,11 @@
 		
 	}, 
 	
-		jugando: 'afk',
-    ocupado: 'afk',  
+	jugando: 'afk',
+        ocupado: 'afk',  
 	comiendo: 'afk', 
-    durmiendo: 'afk', 
-    grabando: 'afk',	
-    aburrido: 'afk', 
+        durmiendo: 'afk', 
+        grabando: 'afk',	
 	programando: 'afk',
 	ausente: 'afk',
 	away: 'afk',
@@ -1215,35 +1214,31 @@
 		var t = 'Away';
 		switch (cmd) {
 			case 'jugando':
-			t = '???????';
+			t = 'ⒿⓊⒼⒶⓃⒹⓄ';  
 			s = 'Jugando'
-			break;   
-			case 'aburrido':
-			t = '????????';
-			s = 'Aburrido'
 			break;  
-            case 'comiendo':
-			t = '????????';
+                        case 'comiendo':
+			t = 'ⒸⓄⓂⒾⒺⓃⒹⓄ';
 			s = 'Comiendo'
 			break;  
-            case 'grabando':
-			t = '????????';
+                        case 'grabando':
+			t = 'ⒼⓇⒶⒷⒶⓃⒹⓄ';
 			s = 'Grabando'
 			break;			
 			case 'durmiendo':
-			t = '?????????';
+			t = 'ⒹⓊⓇⓂⒾⒺⓃⒹⓄ';
 			s = 'Durmiendo'
 			break; 
 			case 'programando':
-			t = '???????????';
+			t = 'ⓅⓇⓄⒼⓇⒶⓂⒶⓃⒹⓄ';
 			s = 'Programando'
 			break;
 			case 'ocupado':
-			t = '???????';
+			t = 'ⓄⒸⓊⓅⒶⒹⓄ';
 			s = 'Ocupado'
 			break;
 			default:
-			t = '???????'
+			t = 'ⒶⓊⓈⒺⓃⓉⒺ'
 			s = 'Ausente'
 			break;
 		}
