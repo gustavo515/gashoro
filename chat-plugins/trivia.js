@@ -570,22 +570,22 @@ var Trivia = (function () {
 
 var commands = {
 	// trivia game commands
-	create: 'new',
-	new: function (target, room) {
+	new: function (target, room, user) {
 		if (room.id !== 'trivia' || !this.can('broadcast', null, room) || !target) return false;
+		if ((user.locked || user.mutedRooms[room.id]) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 		if (trivia[room.id]) return this.sendReply("There is already a trivia game in progress.");
 
 		target = target.split(',');
-		if (target.length !== 3) return this.sendReply("Invallid arguments specified. View /trivia help gcommands for more information.");
+		if (target.length !== 3) return this.sendReply("Invallid arguments specified. View /help trivia for more information.");
 
 		var mode = toId(target[0]);
-		if (!MODES[mode]) return this.sendReply("'" + target[0].trim() + "' is not a valid mode. View /trivia help ginfo for more information.");
+		if (!MODES[mode]) return this.sendReply("'" + target[0].trim() + "' is not a valid mode. View /help trivia for more information.");
 
 		var category = toId(target[1]);
-		if (!CATEGORIES[category]) return this.sendReply("'" + target[1].trim() + "' is not a valid category. View /trivia help ginfo for more information.");
+		if (!CATEGORIES[category]) return this.sendReply("'" + target[1].trim() + "' is not a valid category. View /help trivia for more information.");
 
 		var scoreCap = SCORE_CAPS[toId(target[2])];
-		if (!scoreCap) return this.sendReply("'" + target[2].trim() + "' is not a valid score cap. View /trivia help ginfo for more information.");
+		if (!scoreCap) return this.sendReply("'" + target[2].trim() + "' is not a valid score cap. View /help trivia for more information.");
 
 		trivia[room.id] = new Trivia(mode, category, scoreCap, room);
 		room.addRaw('<div class="broadcast-blue"><strong>Signups for a new trivia game have begun! Enter /trivia join to join.</strong><br />' +
@@ -599,15 +599,17 @@ var commands = {
 		trivium.addParticipant(this, user);
 	},
 
-	start: function (target, room) {
+	start: function (target, room, user) {
 		if (room.id !== 'trivia' || !this.can('broadcast', null, room)) return false;
+		if ((user.locked || user.mutedRooms[room.id]) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 		var trivium = trivia[room.id];
 		if (!trivium) return this.sendReply("There is no trivia game to start.");
 		trivium.startGame(this);
 	},
 
-	kick: function (target, room) {
+	kick: function (target, room, user) {
 		if (room.id !== 'trivia' || !this.can('mute', null, room) || !target) return false;
+		if ((user.locked || user.mutedRooms[room.id]) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 		var trivium = trivia[room.id];
 		if (!trivium) return this.sendReply("There is no trivia game in progress.");
 		trivium.kickParticipant(this, target);
@@ -622,6 +624,7 @@ var commands = {
 
 	end: function (target, room, user) {
 		if (room.id !== 'trivia' || !this.can('broadcast', null, room)) return false;
+		if ((user.locked || user.mutedRooms[room.id]) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 		var trivium = trivia[room.id];
 		if (!trivium) return this.sendReply("There is no trivia game in progress.");
 		trivium.endGame(this, user);
@@ -631,13 +634,14 @@ var commands = {
 	submit: 'add',
 	add: function (target, room, user, connection, cmd) {
 		if (room.id !== 'questionworkshop' || (cmd === 'add' && !this.can('mute', null, room)) || !target) return false;
+		if ((user.locked || user.mutedRooms[room.id]) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 
 		target = target.split('|');
-		if (target.length !== 3) return this.sendReply("Invalid arguments specified. View /trivia help qcommands for more information.");
+		if (target.length !== 3) return this.sendReply("Invalid arguments specified. View /help trivia for more information.");
 
 		var category = toId(target[0]);
 		if (category === 'random') return false;
-		if (!CATEGORIES[category]) return this.sendReply("'" + target[0].trim() + "' is not a valid category. View /trivia help ginfo for more information.");
+		if (!CATEGORIES[category]) return this.sendReply("'" + target[0].trim() + "' is not a valid category. View /help trivia for more information.");
 
 		target[1] = target[1].trim();
 
@@ -695,6 +699,7 @@ var commands = {
 	reject: 'accept',
 	accept: function (target, room, user, connection, cmd) {
 		if (room.id !== 'questionworkshop' || !this.can('mute', null, room) || !target) return false;
+		if ((user.locked || user.mutedRooms[room.id]) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 
 		var isAccepting = cmd === 'accept';
 		var submissions = triviaData.submissions;
@@ -747,7 +752,7 @@ var commands = {
 			});
 
 			var indicesLen = indices.length;
-			if (!indicesLen) return this.sendReply("'" + target.trim() + "' is not a valid set of submission index numbers. View /trivia review and /trivia help qcommands for more information.");
+			if (!indicesLen) return this.sendReply("'" + target.trim() + "' is not a valid set of submission index numbers. View /trivia review and /help trivia for more information.");
 
 			if (isAccepting) {
 				var questions = triviaData.questions;
@@ -766,14 +771,15 @@ var commands = {
 						      (indicesLen > 1 ? "s " : " ") + target + " from the submission database.)");
 		}
 
-		this.sendReply("'" + target + "' is an invalid argument. View /trivia help qcommands for more information.");
+		this.sendReply("'" + target + "' is an invalid argument. View /help trivia for more information.");
 	},
 
 	delete: function (target, room, user) {
 		if (room.id !== 'questionworkshop' || !this.can('mute', null, room) || !target) return false;
+		if ((user.locked || user.mutedRooms[room.id]) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 
 		var question = Tools.escapeHTML(target).trim();
-		if (!question) return this.sendReply("'" + target.trim() + "' is not a valid argument. View /trivia help qcommands for more information.");
+		if (!question) return this.sendReply("'" + target.trim() + "' is not a valid argument. View /help trivia for more information.");
 
 		var questions = triviaData.questions;
 		for (var i = 0; i < questions.length; i++) {
@@ -799,7 +805,7 @@ var commands = {
 			var categoryTally = {};
 			var lastCategoryIdx = 0;
 			var buffer = '|raw|<div class="ladder"><table><tr><th>Category</th><th>Question Count</th></tr>';
-			for (var i = 0; i < 11; i++) {
+			for (var i = 0; i <= 11; i++) {
 				var tally = findEndOfCategory(categories[i], false) - lastCategoryIdx;
 				lastCategoryIdx += tally;
 				buffer += '<tr><td>' + CATEGORIES[categories[i]] + '</td><td>' + tally + ' (' + ((tally * 100) / questionsLen).toFixed(2) + '%)</td></tr>';
@@ -813,7 +819,7 @@ var commands = {
 
 		var category = toId(target);
 		if (category === 'random') return false;
-		if (!CATEGORIES[category]) return this.sendReply("'" + target + "' is not a valid category. View /trivia help ginfo for more information.");
+		if (!CATEGORIES[category]) return this.sendReply("'" + target + "' is not a valid category. View /help trivia for more information.");
 
 		var list = sliceCategory(category);
 		var listLen = list.length;

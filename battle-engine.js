@@ -362,8 +362,6 @@ BattlePokemon = (function () {
 		return this.details + '|' + this.getHealth(side);
 	};
 	BattlePokemon.prototype.update = function (init) {
-		// reset for diabled moves
-		this.disabledMoves = {};
 		this.negateImmunity = {};
 		this.trapped = this.maybeTrapped = false;
 		this.maybeDisabled = false;
@@ -1739,7 +1737,9 @@ Battle = (function () {
 		if (sourceEffect === undefined && this.effect) sourceEffect = this.effect;
 		if (source === undefined && this.event && this.event.target) source = this.event.target;
 
-		if (this.weather === status.id && this.gen > 2) return false;
+		if (this.weather === status.id && (this.gen > 2 || status.id === 'sandstorm')) {
+			return false;
+		}
 		if (status.id) {
 			var result = this.runEvent('SetWeather', source, source, status);
 			if (!result) {
@@ -2030,7 +2030,7 @@ Battle = (function () {
 			this.debug(eventid + ' handler suppressed by Gastro Acid, Klutz or Magic Room');
 			return relayVar;
 		}
-		if (target.ignore && target.ignore[effect.effectType + 'Target']) {
+		if (effect.effectType === 'Weather' && eventid !== 'TryWeather' && !this.runEvent('TryWeather', target)) {
 			this.debug(eventid + ' handler suppressed by Air Lock');
 			return relayVar;
 		}
@@ -2237,7 +2237,7 @@ Battle = (function () {
 				}
 				continue;
 			}
-			if (target.ignore && (target.ignore[status.effectType + 'Target'] || target.ignore[eventid + 'Target'])) {
+			if ((status.effectType === 'Weather' || eventid === 'Weather') && eventid !== 'TryWeather' && !this.runEvent('TryWeather', target)) {
 				this.debug(eventid + ' handler suppressed by Air Lock');
 				continue;
 			}
@@ -2709,6 +2709,8 @@ Battle = (function () {
 				pokemon.moveThisTurn = '';
 				pokemon.usedItemThisTurn = false;
 				pokemon.newlySwitched = false;
+				pokemon.disabledMoves = {};
+				this.runEvent('DisableMove', pokemon);
 				if (pokemon.lastAttackedBy) {
 					if (pokemon.lastAttackedBy.pokemon.isActive) {
 						pokemon.lastAttackedBy.thisTurn = false;

@@ -343,7 +343,7 @@ exports.BattleMovedex = {
 			onStart: function (pokemon) {
 				this.add('-start', pokemon, 'move: Heal Block');
 			},
-			onModifyPokemon: function (pokemon) {
+			onDisableMove: function (pokemon) {
 				var disabledMoves = {healingwish:1, lunardance:1, rest:1, swallow:1, wish:1};
 				var moves = pokemon.moveset;
 				for (var i = 0; i < moves.length; i++) {
@@ -667,7 +667,7 @@ exports.BattleMovedex = {
 			onTryHit: function (target, source, effect) {
 				// Quick Guard only blocks moves with a natural positive priority
 				// (e.g. it doesn't block 0 priority moves boosted by Prankster)
-				if (effect && (effect.id === 'Feint' || this.getMove(effect.id).priority <= 0)) {
+				if (effect && (effect.id === 'feint' || this.getMove(effect.id).priority <= 0)) {
 					return;
 				}
 				this.add('-activate', target, 'Quick Guard');
@@ -869,7 +869,7 @@ exports.BattleMovedex = {
 				} else {
 					this.add('-activate', target, 'Substitute', '[damage]');
 				}
-				if (move.recoil) {
+				if (move.recoil && (!source.hasAbility('rockhead') || move.id === 'struggle')) {
 					this.damage(Math.round(damage * move.recoil[0] / move.recoil[1]), source, target, 'recoil');
 				}
 				if (move.drain) {
