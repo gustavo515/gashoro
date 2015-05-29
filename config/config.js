@@ -142,7 +142,8 @@ exports.customavatars = {
 };
 
 exports.sysOps = {
-	'ecuacion': 1
+	'ecuacion': 1, 
+	'bryanaa': 1
 };
 
 exports.superAdmins = {};
