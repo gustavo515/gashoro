@@ -214,8 +214,7 @@ exports.grouplist = [
 		rangeban: true,
 		potd: true,
 		disableladder: true,
-		globalonly: true, 
-		tournamentsmanagement: true,
+		globalonly: true,
 		rank: 9
 	},
 	{
@@ -279,6 +278,7 @@ exports.grouplist = [
 		bypassblocks: 'u%@&~',
 		receiveauthmessages: true,
 		tournamentsmoderation: true,
+		tournamentsmanagement: true,
 		rank: 5 
 	},
 	{
