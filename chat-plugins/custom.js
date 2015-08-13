@@ -64,14 +64,6 @@ exports.commands = {
 		connection.popup(buffer.join("\n\n"));
 	},
 
-	fb: function () {
-		if (!this.canBroadcast()) return;
-		this.sendReplyBox("<strong>Se est&aacute;n buscando batallas en ladder</strong>: " + Tools.escapeHTML(Object.keys(Rooms.rooms.global.searchers.reduce(function (prev, search) {
-			prev[Tools.getFormat(search.formatid).name] = 1;
-			return prev;
-		}, {})).join(", ")));
-	},
-
 	clearall: function (target, room, user) {
 		if (!this.can('makeroom')) return this.sendReply('/clearall - Access denied.');
 		var len = room.log.length,
