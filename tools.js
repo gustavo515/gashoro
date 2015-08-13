@@ -16,7 +16,7 @@ var fs = require('fs');
 module.exports = (function () {
 	var moddedTools = {};
 
-	var dataTypes = ['FormatsData', 'Learnsets', 'Pokedex', 'Movedex', 'Statuses', 'TypeChart', 'Scripts', 'Items', 'Abilities', 'Formats', 'Aliases'];
+	var dataTypes = ['FormatsData', 'Learnsets', 'Pokedex', 'Movedex', 'Statuses', 'TypeChart', 'Scripts', 'Items', 'Abilities', 'Natures', 'Formats', 'Aliases'];
 	var dataFiles = {
 		'Pokedex': 'pokedex.js',
 		'Movedex': 'moves.js',
@@ -30,156 +30,82 @@ module.exports = (function () {
 		'Learnsets': 'learnsets.js',
 		'Aliases': 'aliases.js'
 	};
-	function Tools(mod, parentMod) {
-		if (!mod) {
-			mod = 'base';
-			this.isBase = true;
-		} else if (!parentMod) {
-			parentMod = 'base';
+
+	var BattleNatures = dataFiles.Natures = {
+		adamant: {name:"Adamant", plus:'atk', minus:'spa'},
+		bashful: {name:"Bashful"},
+		bold: {name:"Bold", plus:'def', minus:'atk'},
+		brave: {name:"Brave", plus:'atk', minus:'spe'},
+		calm: {name:"Calm", plus:'spd', minus:'atk'},
+		careful: {name:"Careful", plus:'spd', minus:'spa'},
+		docile: {name:"Docile"},
+		gentle: {name:"Gentle", plus:'spd', minus:'def'},
+		hardy: {name:"Hardy"},
+		hasty: {name:"Hasty", plus:'spe', minus:'def'},
+		impish: {name:"Impish", plus:'def', minus:'spa'},
+		jolly: {name:"Jolly", plus:'spe', minus:'spa'},
+		lax: {name:"Lax", plus:'def', minus:'spd'},
+		lonely: {name:"Lonely", plus:'atk', minus:'def'},
+		mild: {name:"Mild", plus:'spa', minus:'def'},
+		modest: {name:"Modest", plus:'spa', minus:'atk'},
+		naive: {name:"Naive", plus:'spe', minus:'spd'},
+		naughty: {name:"Naughty", plus:'atk', minus:'spd'},
+		quiet: {name:"Quiet", plus:'spa', minus:'spe'},
+		quirky: {name:"Quirky"},
+		rash: {name:"Rash", plus:'spa', minus:'spd'},
+		relaxed: {name:"Relaxed", plus:'def', minus:'spe'},
+		sassy: {name:"Sassy", plus:'spd', minus:'spe'},
+		serious: {name:"Serious"},
+		timid: {name:"Timid", plus:'spe', minus:'atk'}
+	};
+
+	function tryRequire(filePath) {
+		try {
+			var ret = require(filePath);
+			if (!ret || typeof ret !== 'object') return new TypeError("" + filePath + " must export an object except `null`, or it should be removed");
+			return ret;
+		} catch (e) {
+			return e;
+		}
+	}
+
+	function Tools(mod) {
+		if (!mod) mod = 'base';
+		this.isBase = (mod === 'base');
+
+		var path = (this.isBase ? './data/' : './mods/' + mod + '/') + dataFiles.Scripts;
+		var maybeScripts = tryRequire(path);
+		if (maybeScripts instanceof Error) {
+			if (maybeScripts.code !== 'MODULE_NOT_FOUND') throw new Error("CRASH LOADING DATA: " + maybeScripts.stack);
+		} else {
+			var BattleScripts = maybeScripts.BattleScripts;
+			if (!BattleScripts || typeof BattleScripts !== 'object') throw new TypeError("Exported property `BattleScripts`from `./data/scripts.js` must be an object except `null`.");
+			if (BattleScripts.init) Object.defineProperty(this, 'initMod', {value: BattleScripts.init, enumerable: false, writable: true, configurable: true});
+			if (BattleScripts.inherit) Object.defineProperty(this, 'inheritMod', {value: BattleScripts.inherit, enumerable: false, writable: true, configurable: true});
 		}
 		this.currentMod = mod;
-
-		var data = this.data = {
-			mod: mod
-		};
-		if (mod === 'base') {
-			dataTypes.forEach(function (dataType) {
-				try {
-					var path = './data/' + dataFiles[dataType];
-					data[dataType] = require(path)['Battle' + dataType];
-				} catch (e) {
-					if (e.code !== 'MODULE_NOT_FOUND') console.error('CRASH LOADING DATA: ' + e.stack);
-				}
-				if (!data[dataType]) data[dataType] = {};
-			}, this);
-			try {
-				var path = './config/formats.js';
-				var configFormats = require(path).Formats;
-				for (var i = 0; i < configFormats.length; i++) {
-					var format = configFormats[i];
-					var id = toId(format.name);
-					format.effectType = 'Format';
-					if (format.challengeShow === undefined) format.challengeShow = true;
-					if (format.searchShow === undefined) format.searchShow = true;
-					data.Formats[id] = format;
-				}
-			} catch (e) {
-				if (e.code !== 'MODULE_NOT_FOUND') console.error('CRASH LOADING FORMATS: ' + e.stack);
-			}
-		} else {
-			var parentData = moddedTools[parentMod].data;
-			dataTypes.forEach(function (dataType) {
-				try {
-					var path = './mods/' + mod + '/' + dataFiles[dataType];
-					data[dataType] = require(path)['Battle' + dataType];
-				} catch (e) {
-					if (e.code !== 'MODULE_NOT_FOUND') console.error('CRASH LOADING MOD DATA: ' + e.stack);
-				}
-				if (!data[dataType]) data[dataType] = {};
-				for (var i in parentData[dataType]) {
-					if (data[dataType][i] === null) {
-						// null means don't inherit
-						delete data[dataType][i];
-					} else if (!(i in data[dataType])) {
-						// If it doesn't exist it's inherited from the parent data
-						if (dataType === 'Pokedex') {
-							// Pokedex entries can be modified too many different ways
-							data[dataType][i] = Object.clone(parentData[dataType][i], true);
-						} else {
-							data[dataType][i] = parentData[dataType][i];
-						}
-					} else if (data[dataType][i] && data[dataType][i].inherit) {
-						// {inherit: true} can be used to modify only parts of the parent data,
-						// instead of overwriting entirely
-						delete data[dataType][i].inherit;
-						Object.merge(data[dataType][i], parentData[dataType][i], false, false);
-					}
-				}
-			});
-		}
-		data['Natures'] = {
-			adamant: {name:"Adamant", plus:'atk', minus:'spa'},
-			bashful: {name:"Bashful"},
-			bold: {name:"Bold", plus:'def', minus:'atk'},
-			brave: {name:"Brave", plus:'atk', minus:'spe'},
-			calm: {name:"Calm", plus:'spd', minus:'atk'},
-			careful: {name:"Careful", plus:'spd', minus:'spa'},
-			docile: {name:"Docile"},
-			gentle: {name:"Gentle", plus:'spd', minus:'def'},
-			hardy: {name:"Hardy"},
-			hasty: {name:"Hasty", plus:'spe', minus:'def'},
-			impish: {name:"Impish", plus:'def', minus:'spa'},
-			jolly: {name:"Jolly", plus:'spe', minus:'spa'},
-			lax: {name:"Lax", plus:'def', minus:'spd'},
-			lonely: {name:"Lonely", plus:'atk', minus:'def'},
-			mild: {name:"Mild", plus:'spa', minus:'def'},
-			modest: {name:"Modest", plus:'spa', minus:'atk'},
-			naive: {name:"Naive", plus:'spe', minus:'spd'},
-			naughty: {name:"Naughty", plus:'atk', minus:'spd'},
-			quiet: {name:"Quiet", plus:'spa', minus:'spe'},
-			quirky: {name:"Quirky"},
-			rash: {name:"Rash", plus:'spa', minus:'spd'},
-			relaxed: {name:"Relaxed", plus:'def', minus:'spe'},
-			sassy: {name:"Sassy", plus:'spd', minus:'spe'},
-			serious: {name:"Serious"},
-			timid: {name:"Timid", plus:'spe', minus:'atk'}
-		};
+		this.parentMod = this.isBase ? '' : (this.inheritMod || 'base');
 	}
-	Tools.loadMods = function () {
-		if (Tools.modsLoaded) return;
-		var parentMods = Object.create(null);
-		var mods;
 
-		try {
-			mods = fs.readdirSync('./mods/');
-		} catch (e) {
-			console.error("Error while loading mods: " + e.stack);
-			Tools.modsLoaded = true;
-			return;
+	Tools.preloadMods = function () {
+		if (Tools.preloadedMods) return;
+		var modList = fs.readdirSync('./mods/');
+		for (var i = 0; i < modList.length; i++) {
+			moddedTools[modList[i]] = new Tools(modList[i]);
 		}
-
-		mods.forEach(function (mod) {
-			try {
-				parentMods[mod] = require('./mods/' + mod + '/scripts.js').BattleScripts.inherit || 'base';
-			} catch (e) {
-				if (e.code === 'MODULE_NOT_FOUND') {
-					parentMods[mod] = 'base';
-				} else {
-					console.error("Error while loading mods: " + e.stack);
-				}
-			}
-		});
-
-		try {
-			var didSomething = false;
-			do {
-				didSomething = false;
-				for (var i in parentMods) {
-					if (!moddedTools[i] && moddedTools[parentMods[i]]) {
-						moddedTools[i] = Tools.construct(i, parentMods[i]);
-						didSomething = true;
-					}
-				}
-			} while (didSomething);
-		} catch (e) {
-			console.error("Error while loading mods: " + (e.stack || e));
-		}
-		Tools.modsLoaded = true;
+		Tools.preloadedMods = true;
 	};
 
 	Tools.prototype.mod = function (mod) {
-		Tools.loadMods();
 		if (!moddedTools[mod]) {
 			mod = this.getFormat(mod).mod;
 		}
 		if (!mod) mod = 'base';
-		return moddedTools[mod];
+		return moddedTools[mod].includeData();
 	};
 	Tools.prototype.modData = function (dataType, id) {
 		if (this.isBase) return this.data[dataType][id];
-		var parentMod = this.data.Scripts.inherit;
-		if (!parentMod) parentMod = 'base';
-		if (this.data[dataType][id] !== moddedTools[parentMod].data[dataType][id]) return this.data[dataType][id];
+		if (this.data[dataType][id] !== moddedTools[this.parentMod].data[dataType][id]) return this.data[dataType][id];
 		return (this.data[dataType][id] = Object.clone(this.data[dataType][id], true));
 	};
 
@@ -214,13 +140,53 @@ module.exports = (function () {
 		var typeData = this.data.TypeChart[targetTyping];
 		if (!typeData) return 0;
 		switch (typeData.damageTaken[sourceType]) {
-			case 1: return 1; // super-effective
-			case 2: return -1; // resist
-			// in case of weird situations like Gravity, immunity is
-			// handled elsewhere
-			default: return 0;
+		case 1: return 1; // super-effective
+		case 2: return -1; // resist
+		// in case of weird situations like Gravity, immunity is
+		// handled elsewhere
+		default: return 0;
 		}
 	};
+
+	/**
+	 * Safely ensures the passed variable is a string
+	 * Simply doing '' + str can crash if str.toString crashes or isn't a function
+	 * If we're expecting a string and being given anything that isn't a string
+	 * or a number, it's safe to assume it's an error, and return ''
+	 */
+
+	Tools.prototype.getString = function (str) {
+		if (typeof str === 'string' || typeof str === 'number') return '' + str;
+		return '';
+	};
+
+	/**
+	 * Sanitizes a username or Pokemon nickname
+	 *
+	 * Returns the passed name, sanitized for safe use as a name in the PS
+	 * protocol.
+	 *
+	 * Such a string must uphold these guarantees:
+	 * - must not contain any ASCII whitespace character other than a space
+	 * - must not start or end with a space character
+	 * - must not contain any of: | , [ ]
+	 * - must not be the empty string
+	 *
+	 * If no such string can be found, returns the empty string. Calling
+	 * functions are expected to check for that condition and deal with it
+	 * accordingly.
+	 *
+	 * getName also enforces that there are not multiple space characters
+	 * in the name, although this is not strictly necessary for safety.
+	 */
+
+	Tools.prototype.getName = function (name) {
+		if (typeof name !== 'string' && typeof name !== 'number') return '';
+		name = ('' + name).replace(/[\|\s\[\]\,]+/g, ' ').trim();
+		if (name.length > 18) name = name.substr(0, 18).trim();
+		return name;
+	};
+
 	Tools.prototype.getTemplate = function (template) {
 		if (!template || typeof template === 'string') {
 			var name = (template || '').trim();
@@ -268,13 +234,21 @@ module.exports = (function () {
 				} else if (template.forme === 'Primal') {
 					template.gen = 6;
 					template.isPrimal = true;
-				} else if (template.num >= 650) template.gen = 6;
-				else if (template.num >= 494) template.gen = 5;
-				else if (template.num >= 387) template.gen = 4;
-				else if (template.num >= 252) template.gen = 3;
-				else if (template.num >= 152) template.gen = 2;
-				else if (template.num >= 1) template.gen = 1;
-				else template.gen = 0;
+				} else if (template.num >= 650) {
+					template.gen = 6;
+				} else if (template.num >= 494) {
+					template.gen = 5;
+				} else if (template.num >= 387) {
+					template.gen = 4;
+				} else if (template.num >= 252) {
+					template.gen = 3;
+				} else if (template.num >= 152) {
+					template.gen = 2;
+				} else if (template.num >= 1) {
+					template.gen = 1;
+				} else {
+					template.gen = 0;
+				}
 			}
 		}
 		return template;
@@ -307,13 +281,21 @@ module.exports = (function () {
 			if (!move.effectType) move.effectType = 'Move';
 			if (!move.secondaries && move.secondary) move.secondaries = [move.secondary];
 			if (!move.gen) {
-				if (move.num >= 560) move.gen = 6;
-				else if (move.num >= 468) move.gen = 5;
-				else if (move.num >= 355) move.gen = 4;
-				else if (move.num >= 252) move.gen = 3;
-				else if (move.num >= 166) move.gen = 2;
-				else if (move.num >= 1) move.gen = 1;
-				else move.gen = 0;
+				if (move.num >= 560) {
+					move.gen = 6;
+				} else if (move.num >= 468) {
+					move.gen = 5;
+				} else if (move.num >= 355) {
+					move.gen = 4;
+				} else if (move.num >= 252) {
+					move.gen = 3;
+				} else if (move.num >= 166) {
+					move.gen = 2;
+				} else if (move.num >= 1) {
+					move.gen = 1;
+				} else {
+					move.gen = 0;
+				}
 			}
 			if (!move.priority) move.priority = 0;
 			if (move.ignoreImmunity === undefined) move.ignoreImmunity = (move.category === 'Status');
@@ -360,7 +342,7 @@ module.exports = (function () {
 			} else if (id && this.data.Formats[id]) {
 				effect = this.data.Formats[id];
 				effect.name = effect.name || this.data.Formats[id].name;
-				if (!effect.mod) effect.mod = this.currentMod;
+				if (!effect.mod) effect.mod = 'base';
 				if (!effect.effectType) effect.effectType = 'Format';
 			} else if (id === 'recoil') {
 				effect = {
@@ -394,7 +376,7 @@ module.exports = (function () {
 				if (effect.cached) return effect;
 				effect.cached = true;
 				effect.name = effect.name || this.data.Formats[id].name;
-				if (!effect.mod) effect.mod = this.currentMod;
+				if (!effect.mod) effect.mod = 'base';
 				if (!effect.effectType) effect.effectType = 'Format';
 			}
 			if (!effect.id) effect.id = id;
@@ -432,11 +414,16 @@ module.exports = (function () {
 			if (item.onDrive) item.fling = {basePower: 70};
 			if (item.megaStone) item.fling = {basePower: 80};
 			if (!item.gen) {
-				if (item.num >= 577) item.gen = 6;
-				else if (item.num >= 537) item.gen = 5;
-				else if (item.num >= 377) item.gen = 4;
-				// Due to difference in storing items, gen 2 items must be specified specifically
-				else item.gen = 3;
+				if (item.num >= 577) {
+					item.gen = 6;
+				} else if (item.num >= 537) {
+					item.gen = 5;
+				} else if (item.num >= 377) {
+					item.gen = 4;
+				} else {
+					item.gen = 3;
+				}
+				// Due to difference in storing items, gen 2 items must be specified manually
 			}
 		}
 		return item;
@@ -459,11 +446,17 @@ module.exports = (function () {
 			if (!ability.category) ability.category = 'Effect';
 			if (!ability.effectType) ability.effectType = 'Ability';
 			if (!ability.gen) {
-				if (ability.num >= 165) ability.gen = 6;
-				else if (ability.num >= 124) ability.gen = 5;
-				else if (ability.num >= 77) ability.gen = 4;
-				else if (ability.num >= 1) ability.gen = 3;
-				else ability.gen = 0;
+				if (ability.num >= 165) {
+					ability.gen = 6;
+				} else if (ability.num >= 124) {
+					ability.gen = 5;
+				} else if (ability.num >= 77) {
+					ability.gen = 4;
+				} else if (ability.num >= 1) {
+					ability.gen = 3;
+				} else {
+					ability.gen = 0;
+				}
 			}
 		}
 		return ability;
@@ -913,6 +906,129 @@ module.exports = (function () {
 		return team;
 	};
 
+	Tools.prototype.includeMods = function () {
+		if (this.modsLoaded) return this;
+		if (!this.isLoaded) this.includeData();
+
+		for (var id in moddedTools) {
+			if (moddedTools[id].isLoaded) continue;
+			moddedTools[id].includeData();
+		}
+
+		return this;
+	};
+
+	Tools.prototype.includeData = function () {
+		if (this.isLoaded) return this;
+		if (!this.data) this.data = {mod: this.currentMod};
+		var data = this.data;
+
+		var basePath = './data/';
+		var parentTools;
+		if (this.parentMod) {
+			parentTools = moddedTools[this.parentMod];
+			if (!parentTools || parentTools === this) throw new Error("Unable to load " + this.currentMod + ". `inherit` should specify a parent mod from which to inherit data, or must be not specified.");
+			if (!parentTools.isLoaded) parentTools.includeData();
+			basePath = './mods/' + this.currentMod + '/';
+		}
+
+		dataTypes.forEach(function (dataType) {
+			if (typeof dataFiles[dataType] !== 'string') return (data[dataType] = dataFiles[dataType]);
+			if (dataType === 'Natures') {
+				if (data.mod === 'base') return (data[dataType] = BattleNatures);
+				return;
+			}
+			var maybeData = tryRequire(basePath + dataFiles[dataType]);
+			if (maybeData instanceof Error) {
+				if (maybeData.code !== 'MODULE_NOT_FOUND') throw new Error("CRASH LOADING " + data.mod.toUpperCase() + " DATA:\n" + maybeData.stack);
+				maybeData['Battle' + dataType] = {}; // Fall back to an empty object
+			}
+			var BattleData = maybeData['Battle' + dataType];
+			if (!BattleData || typeof BattleData !== 'object') throw new TypeError("Exported property `Battle" + dataType + "`from `" + './data/' + dataFiles[dataType] + "` must be an object except `null`.");
+			if (BattleData !== data[dataType]) data[dataType] = Object.merge(BattleData, data[dataType]);
+		});
+		if (this.isBase) {
+			// Formats are inherited by mods
+			this.includeFormats();
+		} else {
+			dataTypes.forEach(function (dataType) {
+				var parentTypedData = parentTools.data[dataType];
+				if (!data[dataType]) data[dataType] = {};
+				for (var key in parentTypedData) {
+					if (data[dataType][key] === null) {
+						// null means don't inherit
+						delete data[dataType][key];
+					} else if (!(key in data[dataType])) {
+						// If it doesn't exist it's inherited from the parent data
+						if (dataType === 'Pokedex') {
+							// Pokedex entries can be modified too many different ways
+							data[dataType][key] = Object.clone(parentTypedData[key], true);
+						} else {
+							data[dataType][key] = parentTypedData[key];
+						}
+					} else if (data[dataType][key] && data[dataType][key].inherit) {
+						// {inherit: true} can be used to modify only parts of the parent data,
+						// instead of overwriting entirely
+						delete data[dataType][key].inherit;
+						Object.merge(data[dataType][key], parentTypedData[key], false, false);
+					}
+				}
+			});
+		}
+
+		// Flag the generation. Required for team validator.
+		this.gen = data.Scripts.gen || 6;
+
+		// Execute initialization script.
+		if (typeof this.initMod === 'function') this.initMod();
+
+		this.isLoaded = true;
+		return this;
+	};
+
+	Tools.prototype.includeFormats = function () {
+		if (this.formatsLoaded) return this;
+		Tools.preloadMods();
+
+		if (!this.data) this.data = {mod: this.currentMod};
+		if (!this.data.Formats) this.data.Formats = {};
+
+		// Load [formats] aliases
+		var maybeAliases = tryRequire('./data/' + dataFiles.Aliases);
+		if (maybeAliases instanceof Error) {
+			if (maybeAliases.code !== 'MODULE_NOT_FOUND') throw new Error("CRASH LOADING ALIASES:\n" + maybeAliases.stack);
+			maybeAliases.BattleAliases = {}; // Fall back to an empty object
+		}
+		var BattleAliases = maybeAliases.BattleAliases;
+		if (!BattleAliases || typeof BattleAliases !== 'object') throw new TypeError("Exported property `BattleAliases`from `" + "./data/aliases.js` must be an object except `null`.");
+		this.data.Aliases = BattleAliases;
+
+		// Load formats
+		var maybeFormats = tryRequire('./config/formats.js');
+		if (maybeFormats instanceof Error) {
+			if (maybeFormats.code !== 'MODULE_NOT_FOUND') throw new Error("CRASH LOADING FORMATS:\n" + maybeFormats.stack);
+		}
+		var BattleFormats = maybeFormats.Formats;
+		if (!Array.isArray(BattleFormats)) throw new TypeError("Exported property `Formats`from `" + "./config/formats.js" + "` must be an array.");
+
+		for (var i = 0; i < BattleFormats.length; i++) {
+			var format = BattleFormats[i];
+			var id = toId(format.name);
+			if (!id) throw new RangeError("Format #" + (i + 1) + " must have a name with alphanumeric characters");
+			if (this.data.Formats[id]) throw new Error("Format #" + (i + 1) + " has a duplicate ID: `" + id + "`");
+			format.effectType = 'Format';
+			if (format.challengeShow === undefined) format.challengeShow = true;
+			if (format.searchShow === undefined) format.searchShow = true;
+			if (format.tournamentShow === undefined) format.tournamentShow = true;
+			if (format.mod === undefined) format.mod = 'base';
+			if (!moddedTools[format.mod]) throw new Error("Format `" + format.name + "` requires nonexistent mod: `" + format.mod + "`");
+			this.data.Formats[id] = format;
+		}
+
+		this.formatsLoaded = true;
+		return this;
+	};
+
 	/**
 	 * Install our Tools functions into the battle object
 	 */
@@ -922,23 +1038,7 @@ module.exports = (function () {
 		}
 	};
 
-	Tools.construct = function (mod, parentMod) {
-		var tools = new Tools(mod, parentMod);
-		// Scripts override Tools.
-		var ret = Object.create(tools);
-		tools.install(ret);
-		if (ret.init) {
-			if (parentMod && ret.init === moddedTools[parentMod].data.Scripts.init) {
-				// don't inherit init
-				delete ret.init;
-			} else {
-				ret.init();
-			}
-		}
-		return ret;
-	};
-
-	moddedTools.base = Tools.construct();
+	moddedTools.base = new Tools();
 
 	// "gen6" is an alias for the current base data
 	moddedTools.gen6 = moddedTools.base;

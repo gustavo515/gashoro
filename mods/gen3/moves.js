@@ -653,7 +653,7 @@ exports.BattleMovedex = {
 			},
 			onResidualOrder: 12,
 			onEnd: function (target) {
-				this.add('-end', target, 'move: Taunt');
+				this.add('-end', target, 'move: Taunt', '[silent]');
 			},
 			onDisableMove: function (pokemon) {
 				var moves = pokemon.moveset;
@@ -705,6 +705,28 @@ exports.BattleMovedex = {
 	waterfall: {
 		inherit: true,
 		secondary: false
+	},
+	weatherball: {
+		inherit: true,
+		onModifyMove: function (move) {
+			switch (this.effectiveWeather()) {
+			case 'sunnyday':
+				move.type = 'Fire';
+				move.category = 'Special';
+				break;
+			case 'raindance':
+				move.type = 'Water';
+				move.category = 'Special';
+				break;
+			case 'sandstorm':
+				move.type = 'Rock';
+				break;
+			case 'hail':
+				move.type = 'Ice';
+				move.category = 'Special';
+				break;
+			}
+		}
 	},
 	whirlpool: {
 		inherit: true,

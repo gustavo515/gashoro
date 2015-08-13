@@ -316,6 +316,14 @@ exports.BattleMovedex = {
 			}
 		}
 	},
+	poisongas: {
+		inherit: true,
+		ignoreImmunity: false
+	},
+	poisonpowder: {
+		inherit: true,
+		ignoreImmunity: false
+	},
 	psywave: {
 		inherit: true,
 		damageCallback: function (pokemon) {
@@ -464,6 +472,7 @@ exports.BattleMovedex = {
 					return;
 				}
 				if (move.drain) {
+					this.add('-hint', "In Gold/Silver/Crystal, draining moves always miss against Substitute.");
 					this.add('-miss', source);
 					return null;
 				}
@@ -535,6 +544,10 @@ exports.BattleMovedex = {
 				pokemon.removeVolatile('lockedmove');
 			}
 		}
+	},
+	toxic: {
+		inherit: true,
+		ignoreImmunity: false
 	},
 	triattack: {
 		inherit: true,

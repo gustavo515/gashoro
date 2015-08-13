@@ -200,18 +200,6 @@ exports.BattleMovedex = {
 		inherit: true,
 		pp: 30
 	},
-	feint: {
-		inherit: true,
-		onHit: function (target, source) {
-			var feinted = false;
-			if (target.removeVolatile('protect')) feinted = true;
-			if (target.side !== source.side) {
-				if (target.side.removeSideCondition('quickguard')) feinted = true;
-				if (target.side.removeSideCondition('wideguard')) feinted = true;
-			}
-			if (feinted) this.add('-activate', target, 'move: Feint');
-		}
-	},
 	finalgambit: {
 		inherit: true,
 		desc: "Deals damage to one adjacent target equal to the user's current HP. If this move is successful, the user faints. Makes contact.",
@@ -284,6 +272,7 @@ exports.BattleMovedex = {
 				targetPosition: target.position,
 				source: source,
 				moveData: {
+					name: "Future Sight",
 					basePower: 100,
 					category: "Special",
 					flags: {},
@@ -756,7 +745,7 @@ exports.BattleMovedex = {
 			if (targetAbility === sourceAbility) {
 				return false;
 			}
-			this.add('-activate', source, 'move: Skill Swap', targetAbility, sourceAbility, '[of] ' + target);
+			this.add('-activate', source, 'move: Skill Swap', this.getAbility(targetAbility), this.getAbility(sourceAbility), '[of] ' + target);
 			source.setAbility(targetAbility);
 			target.setAbility(sourceAbility);
 		}
@@ -768,25 +757,25 @@ exports.BattleMovedex = {
 	},
 	skydrop: {
 		inherit: true,
-		onTry: function (attacker, defender, move) {
-			if (defender.fainted) return false;
-			if (attacker.removeVolatile(move.id)) {
-				return;
-			}
-			if (defender.volatiles['substitute'] || defender.side === attacker.side) {
-				return false;
-			}
-			if (defender.volatiles['protect']) {
-				this.add('-activate', defender, 'Protect');
+		onTryHit: function (target, source, move) {
+			if (target.fainted) return false;
+			if (source.removeVolatile(move.id)) {
+				if (target !== source.volatiles['twoturnmove'].source) return false;
+
+				if (target.hasType('Flying')) {
+					this.add('-immune', target, '[msg]');
+					this.add('-end', target, 'Sky Drop');
+					return null;
+				}
+			} else {
+				if (target.volatiles['substitute'] || target.side === source.side) {
+					return false;
+				}
+
+				this.add('-prepare', source, move.name, target);
+				source.addVolatile('twoturnmove', target);
 				return null;
 			}
-			if (defender.volatiles['bounce'] || defender.volatiles['dig'] || defender.volatiles['dive'] || defender.volatiles['fly'] || defender.volatiles['shadowforce']) {
-				this.add('-miss', attacker, defender);
-				return null;
-			}
-			this.add('-prepare', attacker, move.name, defender);
-			attacker.addVolatile('twoturnmove', defender);
-			return null;
 		}
 	},
 	sleeppowder: {
@@ -852,7 +841,8 @@ exports.BattleMovedex = {
 					return;
 				}
 				var damage = this.getDamage(source, target, move);
-				if (!damage) {
+				if (!damage && damage !== 0) {
+					this.add('-fail', target);
 					return null;
 				}
 				damage = this.runEvent('SubDamage', target, source, move, damage);
