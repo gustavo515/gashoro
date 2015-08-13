@@ -82,6 +82,22 @@ exports.commands = {
 			}
 		}, 1000);
 	},
+	
+	destroymodlog: function (target, room, user, connection) {
+		if (!user.hasConsoleAccess(connection)) {return this.sendReply("/destroymodlog - Access denied.");}
+		var fsscript = require('fs');
+		var logPath = LOGS_DIR + 'modlog/';
+		if (CommandParser.modlog && CommandParser.modlog[room.id])  {
+			CommandParser.modlog[room.id].close();
+			delete CommandParser.modlog[room.id];
+		}
+		try {
+			fsscript.unlinkSync(logPath + "modlog_" + room.id + ".txt");
+			this.addModCommand(user.name + " ha destruido el modlog de esta sala." + (target ? ('(' + target + ')') : ''));
+		} catch (e) {
+			this.sendReply("No se puede destruir el modlog de esta sala.");
+		}
+	},
 
 	roomlist: function (target, room, user) {
 		if (!this.can('roomlist')) return;
