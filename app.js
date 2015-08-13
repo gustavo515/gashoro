@@ -75,6 +75,14 @@ if (isLegacyEngine && !(''.includes)) {
 	runNpm('update --production');
 }
 
+try {
+	if (!fs.existsSync(DATA_DIR + "avatars/")) fs.mkdirSync(DATA_DIR + "avatars/");
+	if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR);
+	if (!fs.existsSync(LOGS_DIR + 'chat/')) fs.mkdirSync(LOGS_DIR + 'chat/');
+	if (!fs.existsSync(LOGS_DIR + 'modlog/')) fs.mkdirSync(LOGS_DIR + 'modlog/');
+	if (!fs.existsSync(LOGS_DIR + 'repl/')) fs.mkdirSync(LOGS_DIR + 'repl/');
+} catch (e) {}
+
 /*********************************************************
  * Load configuration
  *********************************************************/
