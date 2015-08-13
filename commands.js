@@ -1387,7 +1387,7 @@ var commands = exports.commands = {
 		var hideIps = !user.can('lock');
 		var path = require('path');
 		var isWin = process.platform === 'win32';
-		var logPath = 'logs/modlog/';
+		var logPath = LOGS_DIR + 'modlog/';
 
 		if (target.includes(',')) {
 			var targets = target.split(',');
@@ -1410,14 +1410,14 @@ var commands = exports.commands = {
 			if (!this.can('modlog')) return;
 			roomNames = "all rooms";
 			// Get a list of all the rooms
-			var fileList = fs.readdirSync('logs/modlog');
+			var fileList = fs.readdirSync(LOGS_DIR + 'modlog/');
 			for (var i = 0; i < fileList.length; ++i) {
-				filename += path.normalize(__dirname + '/' + logPath + fileList[i]) + ' ';
+				filename += path.normalize(logPath + fileList[i]) + ' ';
 			}
 		} else {
 			if (!this.can('modlog', null, Rooms.get(roomId))) return;
 			roomNames = "the room " + roomId;
-			filename = path.normalize(__dirname + '/' + logPath + 'modlog_' + roomId + '.txt');
+			filename = path.normalize(logPath + 'modlog_' + roomId + '.txt');
 		}
 
 		// Seek for all input rooms for the lines or text
