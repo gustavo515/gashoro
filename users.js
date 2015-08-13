@@ -976,12 +976,23 @@ User = (function () {
 			this.updateGroup(registered);
 		}
 
-		if (registered && (userid in bannedUsers || (global.Bot && global.Bot.isBanned(this)))) {
+		if (registered && userid in bannedUsers) {
 			var bannedUnder = '';
 			if (bannedUsers[userid] !== userid) bannedUnder = ' because of rule-breaking by your alt account ' + bannedUsers[userid];
 			this.send("|popup|Your username (" + name + ") is banned" + bannedUnder + "'. Your ban will expire in a few days." + (Config.appealurl ? " Or you can appeal at:\n" + Config.appealurl : ""));
 			this.ban(true, userid);
 			return;
+		}
+		if (global.Permaban && !this.can('staff')) {
+			if (Permaban.permaBan[userid]) {
+				this.send("|popup|Your username (" + name + ") is banned.");
+				this.ban(true, userid);
+				return;
+			}
+			if (Permaban.permaLock[userid]) {
+				this.send("|popup|Your username (" + name + ") is locked.");
+				this.lock(true, userid);
+			}
 		}
 		if (registered && userid in lockedUsers) {
 			var bannedUnder = '';
