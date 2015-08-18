@@ -2,45 +2,23 @@ exports.commands = {
 	foro: function () {
 		if (!this.canBroadcast()) return;
 		this.sendReplyBox("<a href=\"http://ultimatepsim.proboards.com\">Foro de Ultimate Server!</a>");
-	},  
-	ultimatebase: 'baseultimate', 
-    bu: 'baseultimate', 
-    ub: 'baseultimate',	
-	baseultimate: function () {
+	},
+	plugdj: function () {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox("<a href=\"http://i.snag.gy/cNgSR.jpg\">Base Ultimate ORAS! (Code)</a>");
-	}, 
-	admins: function () {
-		if (!this.canBroadcast()) return;
-		this.sendReplyBox("<strong>Administradores de Ultimate: Bryan AA, Topp Dogg, Evilness, The Bleeding, Black Petals, y Klaymore.</strong>");
-	},  
-	viph: function () {
-		if (!this.canBroadcast()) return;
-		this.sendReplyBox("Los usuarios vip (v) son aquellos que han donado al servidor.");
-	},   
-    vipfeatures: function () {
-		if (!this.canBroadcast()) return;
-		this.sendReplyBox("<strong>- Vip Standard 5$ -</strong><br />" +
-			              "- Custom Avatar<br />" + 
-                          "- 60,000 pds<br />" + 
-			              "- Rango vip<br />" + 
-                          "<strong>- Vip Gold 10$ -</strong><br />" + 
-                          "- Custom Avatar<br />" + 
-                          "- 200,000 pds<br />" +
-                          "- Sala propia (Publica o Privada)<br />" );
-	}, 	 
-	 afkhelp: function () {
+		this.sendReplyBox("<a href=\"http://plug.dj/ultimateps/\">Plug DJ de Ultimate!</a>");
+	},
+	afkhelp: function () {
 		if (!this.canBroadcast()) return;
 		this.sendReplyBox("<strong> Comandos de Afk : </strong><br />" +
-			              "/ausente <br />" + 
-                          "/ocupado <br />" + 
-			              "/comiendo <br />" +  
-						  "/aburrido <br />" + 
-                          "/durmiendo <br />" + 
-                          "/grabando (Especialmente para los youtubers)<br />" + 
-                          "/programando (Especialmente para los programadores del servidor).<br />" +  
+			  "/ausente <br />" +
+                          "/ocupado <br />" +
+			  "/comiendo <br />" +
+			  "/aburrido <br />" +
+                          "/durmiendo <br />" +
+                          "/grabando (Especialmente para los youtubers)<br />" +
+                          "/programando (Especialmente para los programadores del servidor).<br />" +
                           "<br />" );
-	}, 	
+	},
         stafflist: 'authlist',
 	authlist: function (target, room, user, connection) {
 		var rankLists = {};
