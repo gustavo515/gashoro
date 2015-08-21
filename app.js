@@ -403,4 +403,5 @@ global.Bot = require('./bot.js');
 global.Clans = require('./clans.js'); 
 global.War = require('./war.js'); 
 global.tour = new (require('./tour.js').tour)();
+global.hangman = new (require('./hangman.js').hangman)();
 global.teamTour = require('./teamtour.js');

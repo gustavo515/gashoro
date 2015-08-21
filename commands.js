@@ -263,6 +263,7 @@ var commands = exports.commands = {
 		// Check if the name already exists as a room or alias
 		if (Rooms.rooms[id] || Rooms.get(id) || Rooms.aliases[id]) return this.sendReply("The room '" + target + "' already exists.");
 		if (Rooms.global.addChatRoom(target)) {
+			hangman.reset(id);
 			if (cmd === 'makeprivatechatroom') {
 				var targetRoom = Rooms.search(target);
 				targetRoom.isPrivate = true;
@@ -1495,6 +1496,9 @@ var commands = exports.commands = {
 				delete require.cache[require.resolve('./commands.js')];
 				delete require.cache[require.resolve('./chat-plugins/info.js')];
 				global.CommandParser = require('./command-parser.js');
+				
+				CommandParser.uncacheTree('./hangman.js');
+				global.hangman = new (require('./hangman.js').hangman)(hangman);
 
 				var runningTournaments = Tournaments.tournaments;
 				CommandParser.uncacheTree('./tournaments');
