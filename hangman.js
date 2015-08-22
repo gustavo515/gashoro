@@ -45,7 +45,7 @@ var cmds = {
 						'<li>/word - Permite a la persona que inició el juego ver la palabra.</li>' +
 						'<li>/category [descripción] OR /topic [descripción] - Permite a la persona que inició el juego cambiar la descripción.</li>' +
 						'<li>/endhangman - Finaliza el juego de hangman. Requiere: + % @ & ~</li></ul>' +
-						'Debido a cambios recientes, hangman puede ser jugado en múltiples chatrooms (exceptuando el lobby por ser muy grande).<br />' +
+						'Debido a cambios recientes, hangman puede ser jugado en múltiples chatrooms.<br />' +
 						'Diviertete y siéntete libre de mandar un MP si encuentras un bug en el juego - Sweetie');
 	},
 
@@ -60,9 +60,6 @@ var cmds = {
 		}
 		if (!user.can('broadcast', room)) {
 			return this.sendReply('No tienes la suficiente autoridad para hacer esto.');
-		}
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor, intenta jugar en otra sala, es muy grande para el lobby');
 		}
 		if(hangman[room.id].hangman === true) {
 			return this.sendReply('Hay un juego de hangman en curso');
@@ -99,9 +96,6 @@ var cmds = {
 	},
 
 	viewhangman: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
 		if (!this.canBroadcast()) return;
 		if(hangman[room.id].hangman === false) {
 			return this.sendReply('No hay juego de hangman en curso.');
@@ -111,9 +105,6 @@ var cmds = {
 
 	 topic: 'category',
 	 category: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
 		if(hangman === false) {
 			return this.sendReply('No hay juego de hangman en curso.');
 		}
@@ -126,9 +117,6 @@ var cmds = {
 
 
 	word: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
 		if(user.userid === hangman[room.id].hangmaner[0]) {
 			return this.sendReply('La palabra es \'' + hangman[room.id].guessword[0] + '\'.');
 		}
@@ -138,9 +126,6 @@ var cmds = {
 	},
 
 	guess: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
 		if(hangman[room.id].hangman === false) {
 			return this.sendReply('No hay juego de hangman en curso.');
 		}
@@ -187,9 +172,6 @@ var cmds = {
 	},
 
 	guessword: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
 		if(hangman[room.id].hangman === false) {
 			return this.sendReply('No hay juego de hangman en curso');
 		}
@@ -219,9 +201,6 @@ var cmds = {
 	},
 
 	endhangman: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
 		if (!user.can('broadcast', room)) {
 			return this.sendReply('No tienes suficiente autoridad para hacer esto.');
 		}
