@@ -17,5 +17,6 @@ exports.commands = {
 
   gai: function(room, user, cmd) {
       return this.parse('/pm Chaos of Death, http://data7.lustich.de/bilder/l/30292-selfmade-scheisse.jpg');
-  }
+  },
+
 };
