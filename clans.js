@@ -204,18 +204,16 @@ exports.createClan = function (name) {
 		wins: 0,
 		losses: 0,
 		draws: 0,
-		rating: 750,
+		rating: 1000,
 		//otros datos de clanes
 		compname: name,
 		leaders: {},
 		oficials: {},
 		invitations: {},
 		logo: "",
-		lema: "Lema del gremio",
+		lema: "Lema del clan",
 		sala: "none",
 		medals: {},
-		places: 4,
-		
 	};
 	writeClanData();
 
@@ -514,29 +512,6 @@ exports.deleteMedal = function (clan, medalName) {
 	return true;
 };
 
-exports.canAddMember = function (clan) {
-	var clanId = toId(clan);
-	if (!clans[clanId])
-		return false;
-	if (Object.keys(clans[clanId].members).length >= clans[clanId].places) return false;
-	return true;
-};
-
-exports.getPlaces = function (clan) {
-	var clanId = toId(clan);
-	if (!clans[clanId])
-		return 0;
-	return clans[clanId].places;
-};
-
-exports.addPlaces = function (clan, places) {
-	var clanId = toId(clan);
-	if (!clans[clanId] || !places || !parseInt(places))
-		return false;
-	clans[clanId].places += parseInt(places);
-	return true;
-};
-
 exports.addMember = function (clan, user) {
 	var clanId = toId(clan);
 	var userId = toId(user);
@@ -756,22 +731,23 @@ exports.setWarResult = function (clanA, clanB, scoreA, scoreB, warStyle, warSize
 	clans[clanBId].rating = parseInt(clans[clanBId].rating); // no decimal ratings
 	var clanAExpectedResult;
 	var clanBExpectedResult;
+	elo.setKFactor(multip);
 	if (scoreA > scoreB) {
 		++clans[clanAId].wins;
 		++clans[clanBId].losses;
 		result = 1;
-		var scoreRest = (clans[clanBId].rating * 15) / 100; 
-		if (scoreRest < 50) scoreRest = 50;
-		clans[clanAId].rating += scoreRest;
-		clans[clanBId].rating -= scoreRest;
+		clanAExpectedResult = elo.getExpected(clans[clanAId].rating, clans[clanBId].rating);
+		clans[clanAId].rating = elo.updateRating(clanAExpectedResult, result, clans[clanAId].rating);
+		clanBExpectedResult = elo.getExpected(clans[clanBId].rating, clans[clanAId].rating);
+		clans[clanBId].rating = elo.updateRating(clanBExpectedResult, 1 - result, clans[clanBId].rating);
 	} else if (scoreB > scoreA) {
 		++clans[clanAId].losses;
 		++clans[clanBId].wins;
 		result = 0;
-		var scoreRest = (clans[clanAId].rating * 15) / 100; 
-		if (scoreRest < 50) scoreRest = 50;
-		clans[clanAId].rating -= scoreRest;
-		clans[clanBId].rating += scoreRest;
+		clanAExpectedResult = elo.getExpected(clans[clanAId].rating, clans[clanBId].rating);
+		clans[clanAId].rating = elo.updateRating(clanAExpectedResult, result, clans[clanAId].rating);
+		clanBExpectedResult = elo.getExpected(clans[clanBId].rating, clans[clanAId].rating);
+		clans[clanBId].rating = elo.updateRating(clanBExpectedResult, 1 - result, clans[clanBId].rating);
 	} else {
 		addPoints['A'] = 0;
 		addPoints['B'] = 0;
@@ -779,10 +755,10 @@ exports.setWarResult = function (clanA, clanB, scoreA, scoreB, warStyle, warSize
 		++clans[clanBId].draws;
 		multip = 0;
 	}
-	if (clans[clanAId].rating < 0)
-		clans[clanAId].rating = 0;
-	if (clans[clanBId].rating < 0)
-		clans[clanBId].rating = 0;
+	if (clans[clanAId].rating < 1000)
+		clans[clanAId].rating = 1000;
+	if (clans[clanBId].rating < 1000)
+		clans[clanBId].rating = 1000;
 	writeClanData();
 	addPoints['A'] = clans[clanAId].rating - oldScoreA;
 	addPoints['B'] = clans[clanBId].rating - oldScoreB;
