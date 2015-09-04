@@ -16,7 +16,12 @@ exports.commands = {
      *********************************************************/
 
   gai: function(room, user, cmd) {
-      return this.parse('/pm Chaos of Death, http://data7.lustich.de/bilder/l/30292-selfmade-scheisse.jpg');
+      return this.parse('/pm The Bleeding, http://data7.lustich.de/bilder/l/30292-selfmade-scheisse.jpg');
+  },
+  
+  jara: function(target, room, user) {
+      if (!this.canBroadcast()) return;
+      this.sendReplyBox('<center>Lost Seso: A que chica de ps os zumbabais</center><b><big><big><big><marquee><blink>%LloydJara: Irene *Shot*</blink></marquee></big></big></big></b>');
   },
 
 };
