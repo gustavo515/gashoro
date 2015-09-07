@@ -8,6 +8,7 @@
  *
  * @license MIT license
  */
+var fs = require('fs');
 
 const TIMEOUT_EMPTY_DEALLOCATE = 10 * 60 * 1000;
 const TIMEOUT_INACTIVE_DEALLOCATE = 40 * 60 * 1000;
@@ -15,9 +16,11 @@ const REPORT_USER_STATS_INTERVAL = 10 * 60 * 1000;
 const PERIODIC_MATCH_INTERVAL = 60 * 1000;
 
 var chatRoomsDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'chatrooms.json' : './config/chatrooms.json';
-var chatRoomsDataFile0 = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'chatrooms.json.0' : './config/chatrooms.json.0';
 
-var fs = require('fs');
+if (!fs.existsSync(chatroomDataFile))
+	fs.writeFileSync(chatroomDataFile, '{}');
+	
+var rooms = JSON.parse(fs.readFileSync(chatroomDataFile).toString());
 
 /* global Rooms: true */
 var Rooms = module.exports = getRoom;
