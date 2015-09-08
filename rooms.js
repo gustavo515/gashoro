@@ -15,7 +15,7 @@ const TIMEOUT_INACTIVE_DEALLOCATE = 40 * 60 * 1000;
 const REPORT_USER_STATS_INTERVAL = 10 * 60 * 1000;
 const PERIODIC_MATCH_INTERVAL = 60 * 1000;
 
-var chatRoomsDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'chatrooms.json' : './config/chatrooms.json';
+const chatRoomsDataFile = DATA_DIR + 'chatrooms.js';
 
 if (!fs.existsSync(chatRoomsDataFile))
 	fs.writeFileSync(chatRoomsDataFile, '{}');
