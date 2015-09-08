@@ -17,10 +17,10 @@ const PERIODIC_MATCH_INTERVAL = 60 * 1000;
 
 var chatRoomsDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'chatrooms.json' : './config/chatrooms.json';
 
-if (!fs.existsSync(chatroomDataFile))
-	fs.writeFileSync(chatroomDataFile, '{}');
+if (!fs.existsSync(chatRoomsDataFile))
+	fs.writeFileSync(chatRoomsDataFile, '{}');
 	
-var rooms = JSON.parse(fs.readFileSync(chatroomDataFile).toString());
+var rooms = JSON.parse(fs.readFileSync(chatRoomsDataFile).toString());
 
 /* global Rooms: true */
 var Rooms = module.exports = getRoom;
