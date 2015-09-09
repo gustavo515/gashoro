@@ -8,19 +8,13 @@
  *
  * @license MIT license
  */
-var fs = require('fs');
 
 const TIMEOUT_EMPTY_DEALLOCATE = 10 * 60 * 1000;
 const TIMEOUT_INACTIVE_DEALLOCATE = 40 * 60 * 1000;
 const REPORT_USER_STATS_INTERVAL = 10 * 60 * 1000;
 const PERIODIC_MATCH_INTERVAL = 60 * 1000;
 
-const chatRoomsDataFile = DATA_DIR + 'chatrooms.js';
-
-if (!fs.existsSync(chatRoomsDataFile))
-	fs.writeFileSync(chatRoomsDataFile, '{}');
-	
-var rooms = JSON.parse(fs.readFileSync(chatRoomsDataFile).toString());
+var fs = require('fs');
 
 /* global Rooms: true */
 var Rooms = module.exports = getRoom;
