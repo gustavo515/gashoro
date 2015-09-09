@@ -8,6 +8,9 @@
  *
  * @license MIT license
  */
+ 
+var chatRoomsDataFile = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'chatrooms.json' : './config/chatrooms.json';
+var chatRoomsDataFile0 = (process.env.OPENSHIFT_DATA_DIR) ? process.env.OPENSHIFT_DATA_DIR + 'chatrooms.json.0' : './config/chatrooms.json.0';
 
 const TIMEOUT_EMPTY_DEALLOCATE = 10 * 60 * 1000;
 const TIMEOUT_INACTIVE_DEALLOCATE = 40 * 60 * 1000;
