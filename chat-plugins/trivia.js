@@ -536,7 +536,8 @@ var Trivia = (function () {
 var commands = {
 	// trivia game commands
 	new: function (target, room, user) {
-		if (room.id !== 'trivia' || !this.can('broadcast', null, room) || !target) return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
+		if (!this.can('broadcast', null, room) || !target) return false;
 		if ((user.locked || room.isMuted(user)) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 		if (trivia[room.id]) return this.sendReply("There is already a trivia game in progress.");
 
@@ -558,7 +559,7 @@ var commands = {
 	},
 
 	join: function (target, room, user) {
-		if (room.id !== 'trivia') return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
 		var trivium = trivia[room.id];
 		if (!trivium) return this.sendReply("There is no trivia game in progress.");
 		if (!this.canTalk()) return;
@@ -566,7 +567,8 @@ var commands = {
 	},
 
 	start: function (target, room, user) {
-		if (room.id !== 'trivia' || !this.can('broadcast', null, room)) return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
+		if (!this.can('broadcast', null, room)) return false;
 		if ((user.locked || room.isMuted(user)) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 		var trivium = trivia[room.id];
 		if (!trivium) return this.sendReply("There is no trivia game to start.");
@@ -574,7 +576,8 @@ var commands = {
 	},
 
 	kick: function (target, room, user) {
-		if (room.id !== 'trivia' || !this.can('mute', null, room) || !target) return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
+		if (!this.can('mute', null, room) || !target) return false;
 		if ((user.locked || room.isMuted(user)) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 		var trivium = trivia[room.id];
 		if (!trivium) return this.sendReply("There is no trivia game in progress.");
@@ -583,7 +586,7 @@ var commands = {
 	},
 
 	answer: function (target, room, user) {
-		if (room.id !== 'trivia') return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
 
 		target = toId(target);
 		if (!target) return this.sendReply("No valid answer was specified.");
@@ -594,7 +597,8 @@ var commands = {
 	},
 
 	end: function (target, room, user) {
-		if (room.id !== 'trivia' || !this.can('broadcast', null, room)) return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
+		if (!this.can('broadcast', null, room)) return false;
 		if ((user.locked || room.isMuted(user)) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 		var trivium = trivia[room.id];
 		if (!trivium) return this.sendReply("There is no trivia game in progress.");
@@ -604,7 +608,8 @@ var commands = {
 	// question database modifying commands
 	submit: 'add',
 	add: function (target, room, user, connection, cmd) {
-		if (room.id !== 'questionworkshop' || (cmd === 'add' && !this.can('mute', null, room)) || !target) return false;
+		if (room.id !== 'questionworkshop') return this.sendReply('This command can only be used in Question Workshop.');
+		if (cmd === 'add' && !this.can('mute', null, room) || !target) return false;
 		if ((user.locked || room.isMuted(user)) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 
 		target = target.split('|');
@@ -650,7 +655,8 @@ var commands = {
 	},
 
 	review: function (target, room) {
-		if (room.id !== 'questionworkshop' || !this.can('mute', null, room)) return false;
+		if (room.id !== 'questionworkshop') return this.sendReply('This command can only be used in Question Workshop.');
+		if (!this.can('mute', null, room)) return false;
 
 		var submissions = triviaData.submissions;
 		var submissionsLen = submissions.length;
@@ -671,7 +677,8 @@ var commands = {
 
 	reject: 'accept',
 	accept: function (target, room, user, connection, cmd) {
-		if (room.id !== 'questionworkshop' || !this.can('mute', null, room)) return false;
+		if (room.id !== 'questionworkshop') return this.sendReply('This command can only be used in Question Workshop.');
+		if (!this.can('mute', null, room)) return false;
 		if ((user.locked || room.isMuted(user)) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 
 		target = target.trim();
@@ -751,7 +758,8 @@ var commands = {
 	},
 
 	delete: function (target, room, user) {
-		if (room.id !== 'questionworkshop' || !this.can('mute', null, room)) return false;
+		if (room.id !== 'questionworkshop') return this.sendReply('This command can only be used in Question Workshop.');
+		if (!this.can('mute', null, room)) return false;
 		if ((user.locked || room.isMuted(user)) && !user.can('bypassall')) return this.sendReply("You cannot do this while unable to talk.");
 
 		target = target.trim();
@@ -773,7 +781,8 @@ var commands = {
 	},
 
 	qs: function (target, room, user) {
-		if (room.id !== 'questionworkshop') return false;
+		if (room.id !== 'questionworkshop') return this.sendReply('This command can only be used in Question Workshop.');
+		var buffer = "|raw|<div class=\"ladder\"><table>";
 		if (!target) {
 			if (!this.canBroadcast()) return false;
 
@@ -830,14 +839,16 @@ var commands = {
 	// informational commands
 	'': 'status',
 	status: function (target, room, user) {
-		if (room.id !== 'trivia' || !this.canBroadcast()) return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
+		if (!this.canBroadcast()) return false;
 		var trivium = trivia[room.id];
 		if (!trivium) return this.sendReplyBox("There is no trivia game in progress.");
 		trivium.getStatus(this, user);
 	},
 
 	players: function (target, room) {
-		if (room.id !== 'trivia' || !this.canBroadcast()) return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
+		if (!this.canBroadcast()) return false;
 		var trivium = trivia[room.id];
 		if (!trivium) return this.sendReplyBox("There is no trivia game in progress.");
 		trivium.getParticipants(this);
@@ -845,7 +856,7 @@ var commands = {
 
 	ranking: 'rank',
 	rank: function (target, room, user) {
-		if (room.id !== 'trivia') return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
 
 		var name = '';
 		var userid = '';
@@ -868,7 +879,8 @@ var commands = {
 	},
 
 	ladder: function (target, room) {
-		if (room.id !== 'trivia' || !this.canBroadcast()) return false;
+		if (room.id !== 'trivia') return this.sendReply('This command can only be used in Trivia.');
+		if (!this.canBroadcast()) return false;
 
 		var ladder = triviaData.ladder;
 		var leaderboard = triviaData.leaderboard;
