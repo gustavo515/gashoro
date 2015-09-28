@@ -44,6 +44,7 @@ exports.commands = {
 
 	clearall: function (target, room, user) {
 		if (!this.can('makeroom')) return this.sendReply('/clearall - Access denied.');
+		if (!room.battle) return this.errorReply('/clearall no puede ser usado en batallas.');
 		var len = room.log.length,
 			users = [];
 		while (len--) {
